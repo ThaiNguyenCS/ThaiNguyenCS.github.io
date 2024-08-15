@@ -1,0 +1,22 @@
+.item {
+    list-style: none;
+    display: flex;
+    background-color: white;
+    border: 1px solid black;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    align-items: start;
+    flex-direction: column;
+}
+
+.item-title
+{
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.item-title:hover
+{
+    text-decoration: underline;
+}

@@ -1,0 +1,57 @@
+.header-container {
+    display: flex;
+    height: var(--header-height);
+    align-items: center;
+    position: fixed;
+    left: 0;
+    background-color: white;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+}
+
+#side-menu-button,
+#setting-button {
+    flex-basis: 70px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none; /* prevent the title highlighted */
+}
+
+#side-menu-icon,
+#setting-icon {
+    height: 35px;
+    padding: 5px;
+    position: relative;
+    z-index: 10;
+    width: 35px;
+    border: none;
+    border-radius: 999px;
+    transition: 150ms;
+}
+
+#side-menu-icon:hover,
+#setting-icon:hover {
+    background-color: var(--option-hover-color);
+}
+
+#side-menu-icon:active,
+#setting-icon:active {
+    background-color: var(--option-active-color);
+}
+
+#web-title {
+    flex: 1;
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+#web-title-text {
+    cursor: pointer;
+}
+
+#dictation-navigation {
+    cursor: pointer;
+}

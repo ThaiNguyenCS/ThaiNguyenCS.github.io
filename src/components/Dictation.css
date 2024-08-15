@@ -1,0 +1,159 @@
+.dictation-container {
+    display: grid;
+    margin-top: 10px;
+    grid-template-columns: 3fr 2fr;
+    outline: 1px solid rgba(210, 210, 210, 0.655);
+    padding: 16px;
+}
+
+.left-section {
+    grid-column: 1/2;
+}
+
+.right-section {
+    grid-column: 2/3;
+    display: flex;
+    margin-left: 20px;
+    flex-direction: column;
+}
+
+.video-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+}
+
+.control-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.middle-section {
+    display: flex;
+}
+
+
+#replay-button {
+    width: 30px;
+    cursor: pointer;
+    justify-self: start;
+}
+
+#question-info {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+#next-button,
+#back-button {
+    width: 26px;
+    cursor: pointer;
+    height: 26px;
+    border: none;
+    border-radius: 999px;
+    user-select: none;
+}
+
+#next-button:hover,
+#back-button:hover
+{
+    background-color: rgb(224, 224, 224);
+}
+
+.input-area {
+    font-size: 1.2rem;
+    margin-top: 5px;
+    width: 100%;
+    min-height: 2rem;
+    resize: vertical;
+    max-height: 500px;
+    padding: 10px;
+}
+
+.check-option-container {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    justify-content: space-between;
+}
+
+.check-button,
+#skip-button {
+    cursor: pointer;
+    padding: 6px 20px;
+}
+
+#skip-button:hover
+{
+    text-decoration: underline;
+}
+
+
+.invisible-button
+{
+    visibility: hidden;
+}
+
+
+.answer-container
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.answer-title
+{
+    font-size: 1.2rem;
+}
+
+.answer-textarea
+{
+    resize: none;
+    outline:none;
+    height: fit-content;
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.answer-textarea.wrong-answer
+{
+    border: 2px solid red;
+}
+
+.answer-textarea.correct-answer
+{
+    border: 2px solid rgb(10, 209, 10);
+}
+
+#next-button2, #skip-button2
+{
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.question-status
+{
+    color: gray;
+    font-weight: 600;
+}
+
+.question-status.correct
+{
+    color: rgb(10, 209, 10);
+}
+
+.question-status.incorrect
+{
+    color: red;
+}
+
+#submit-button
+{
+    margin-top: 50px;
+    flex-grow: 0;
+    align-self: center;
+    padding: 5px 30px;
+}

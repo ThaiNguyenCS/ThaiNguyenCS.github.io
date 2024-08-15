@@ -1,0 +1,26 @@
+.topic-holder {
+    display: flex;
+    height: 210px;
+    flex-direction: column;
+    cursor: pointer;
+    border: 1px solid gray;
+}
+
+.topic-img-holder {
+    height: 75%;
+    width: 100%;
+}
+
+.topic-img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.topic-title {
+    font-size: 1rem;
+}
+.topic-exercise-count {
+    font-size: 1rem;
+}
