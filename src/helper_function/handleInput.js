@@ -2,19 +2,14 @@ function handleInput(str) {
     let input = str;
     input = input.toLowerCase();
     let formattedInput = "";
-    let countConsecutiveSpaces = 0
-    for(let i = 0; i < input.length; i++)
-    {
-        const chr = input.charAt(i)
-        if(chr === ' ')
-        {
-            countConsecutiveSpaces++
-            if(countConsecutiveSpaces < 2)
-                formattedInput += chr    
-        }
-        else if(chr >= 'a' && chr <= 'z')
-        {
-            formattedInput += chr
+    let countConsecutiveSpaces = 0;
+    for (let i = 0; i < input.length; i++) {
+        const chr = input.charAt(i);
+        if (chr === " ") {
+            countConsecutiveSpaces++;
+            if (countConsecutiveSpaces < 2) formattedInput += chr;
+        } else if (chr >= "a" && chr <= "z") {
+            formattedInput += chr;
             countConsecutiveSpaces = 0;
         }
     }
@@ -22,4 +17,78 @@ function handleInput(str) {
     return formattedInput;
 }
 
-export {handleInput}
+function checkValidRegisterUserName(username) {
+    let formatName = username.trim();
+    if (formatName.length < 3) return {result: false, msg: 'Username must be at least 3 characters length'};
+    for (let i = 0; i < formatName.length; i++) {
+        const chr = formatName.charAt(i);
+        if (
+            !(
+                (chr >= "a" && chr <= "z") ||
+                (chr >= "A" && chr <= "Z") ||
+                chr === " " ||
+                chr === "_" ||
+                (chr >= "0" && chr <= "9")
+            )
+        )
+            return {result: false, msg: "Username can only contain lowercase, uppercase, number, space and underscore"};
+    }
+    return {result: true, msg: "Valid username"};
+}
+// password: at least 1 uppercase, 1 lowercase, 1 number, length is more than 8
+function checkValidRegisterPassword(password) {
+    const requirement = { lwrcase: false, uprcase: false, hasNumber: false };
+    if (password.length < 8)
+        return {
+            result: false,
+            msg: "Password must be at least 8 characters length",
+        };
+    if (password.length > 32)
+        return {
+            result: false,
+            msg: "Password must be at most 32 characters length",
+        };
+    for (let i = 0; i < password.length; i++) {
+        const chr = password.charAt(i);
+        if (chr >= "a" && chr <= "z") requirement.lwrcase = true;
+        if (chr >= "A" && chr <= "Z") requirement.uprcase = true;
+        if (chr >= "0" && chr <= "9") requirement.hasNumber = true;
+    }
+    if (requirement.hasNumber && requirement.uprcase && requirement.lwrcase)
+        return { result: true, msg: "Password is valid" };
+    return { result: false, msg: "Password does not meet all the demands" };
+}
+
+function checkTheSecondPassword(password1, password2)
+{
+    if(password1 !== password2)
+        return {result: false, msg: "Password does not match!"}
+    return {result: true, msg: "Password matched!"}
+}
+
+function convertPixelSizeToNumber (str)
+{
+    if(str.length < 3)
+    {
+        console.log("Invalid str");
+        return 0;
+    }
+    let formattedStr = str.substring(0, str.length-2);
+    return Number(formattedStr);
+}
+
+function convertSecondsToTime (second)
+{
+    if(second < 60)
+    {
+        return `00:${second.toString().padStart(2, '0')}`
+    }
+    else
+    {
+        const minutes = Math.trunc(second / 60);
+        const leftSecond = second % 60;
+        return `${minutes.toString().padStart(2, '0')}:${leftSecond.toString().padStart(2, '0')}`
+    }
+}
+
+export { handleInput, checkValidRegisterPassword, checkValidRegisterUserName, checkTheSecondPassword, convertPixelSizeToNumber, convertSecondsToTime };

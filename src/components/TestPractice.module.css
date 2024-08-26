@@ -1,0 +1,105 @@
+.test-title
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.container {
+    width: 100%;
+    padding: 0 2% 20px 2%;
+    display: flex;
+    padding-top: 50px;
+}
+.test-side {
+    flex: 5;
+    display: flex;
+    border: 1px solid rgb(224, 224, 224);
+    padding: 10px;
+}
+
+.test-side .left-section {
+    flex: 3;
+    max-height: 1000px;
+    overflow: scroll;
+}
+
+.part-container, .section-container {
+    display: none;
+    padding: 0 3px;
+}
+
+.part-container.active, .section-container.active {
+    display: block;
+}
+
+.test-side .resize-bar
+{
+    width: 3px;
+    height: 100%;
+    border: 1px solid rgb(205, 205, 205);
+    margin: 1px 10px;
+    cursor: ew-resize;
+}
+
+.test-side .right-section {
+    flex: 1;
+    max-height: 1000px;
+    overflow: scroll;
+}
+
+.control-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: sticky;
+    height: 600px;
+    background-color: rgb(234, 234, 234);
+    top: var(--header-height);
+    color: black;
+    overflow-y: scroll;
+    padding: 20px 10px;
+}
+
+.question-nav-container
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+}
+
+.question-nav-button
+{
+    width: 25px;
+    height: 25px;
+    border: 1px solid black;
+    background-color: white;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: grid;
+    cursor: pointer;
+    place-items: center;
+    user-select: none;
+}
+
+.question-nav-button:hover
+{
+    background-color: rgb(222, 222, 222);
+}
+
+.question-nav-button:active
+{
+    background-color: rgb(197, 197, 197);
+}
+
+.submit-button{
+    width: max(150px, 40%);
+    flex-basis: 30px;
+    margin-top: auto;
+    position: sticky;
+    bottom: 0;
+    flex-shrink: 0;
+}

@@ -31,4 +31,4 @@ const TopicItem = (props) => {
     );
 };
 
-export default TopicItem;
+export  {TopicItem};

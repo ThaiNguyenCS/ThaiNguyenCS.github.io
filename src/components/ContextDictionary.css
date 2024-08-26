@@ -1,0 +1,20 @@
+.dictionary-context
+{
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    position: absolute;
+    height: 200px;
+    background-color: white;
+    border: 0.5px solid rgb(216, 216, 216);
+}
+
+.dictionary-context.invisible
+{
+    visibility: hidden;
+}
+
+.dict-close-button {
+    width: 2rem;
+    height: 2rem;
+}

@@ -1,7 +1,5 @@
 .main-page-body
 {
-    padding: var(--header-height);
-    padding-left: 50px;
+    padding-top: var(--header-height);
     width: 100%;
-    padding-right: 50px;
 }

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import { useEffect } from "react";
-import "./Dictation.css";
+import styles from "./Dictation.module.css";
 import { useState } from "react";
 import { useRef } from "react";
 
@@ -13,33 +13,53 @@ import SubmitPopup from "./SubmitPopup";
 import { openPopup } from "../slicers/SubmitPopupSlice";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-
 import { handleInput as preprocessStr } from "../helper_function/handleInput";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
+import { SpanWithDictionary } from "./SpanWithDictionary";
+import { ContextDictionary } from "./ContextDictionary";
+import { openDict, resetDict } from "../slicers/ContextDictSlice";
+
+const apiURL = import.meta.env.VITE_API_URL;
 
 const statusStr = ["Not done", "Incorrect", "Done"];
 // const arr = [0, 5.64, 8.64, 18.4, 30.6, 34.08, 38.24, 45.56, 171]; // arr.length-1 = the number of questions
 const sentences = [
-    "These are silver with dot ...",
-    "These are silver",
-    "These are silver",
-    "These are silver",
-    "These are silver",
-    "These are silver",
-    "These are silver",
-    "These are silver",
-    "These are silver",
-    "These are silver",
+    "test test test test test test test notest test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test",
+    "test test",
+    "test test",
+    "test test",
+    "test test",
+    "test test",
+    "test test",
+    "test test",
+    "test test",
+    "test test",
 ];
+
+const DictationExContext = createContext(null);
 
 const loader = async ({ params, request }) => {
     console.log(`request to /data/${params.topic}/${params.exerciseID}`);
-    const res = await axios.get(`/data/${params.topic}/${params.exerciseID}`);
-    let result = res.data; // {status, array}
+
+    const token = localStorage.getItem("jwt_token");
+    const res = await axios.get(
+        `${apiURL}/data/${params.topic}/${params.exerciseID}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token || "no_token"}`,
+            },
+        }
+    );
+    let result = res.data; // {status, isSaved, data}
     let video;
     if (result.status && result.data.length > 0) {
         video = result.data[0]; // extract video from array
-    } else return null;
+        if (result.isSaved) {
+            // Convert resultArr str to resultArr array
+            video.resultArr = JSON.parse(video.resultArr);
+            console.log(video.resultArr);
+        }
+    } else return {};
 
     console.log(video);
     let timelines = video.timeline;
@@ -57,7 +77,16 @@ const action = async ({ params }) => {};
 // idx start with 1
 
 const Dictation = (props) => {
-    const {timeline, title, noOfQuestions, videoID} = useLoaderData();
+    const {
+        timeline,
+        title,
+        noOfQuestions,
+        videoID,
+        videoType,
+        id,
+        resultArr,
+        youtubeID,
+    } = useLoaderData();
     const video = useRef(null);
     const [play, setPlay] = useState(false);
     const dispatch = useDispatch();
@@ -66,19 +95,38 @@ const Dictation = (props) => {
     const [back, setBack] = useState(false);
     const [next, setNext] = useState(false);
     const [replay, setReplay] = useState(false);
-    const intervalRef = useRef(null);
-    const nextButton2 = useRef(null);
+
     const [showAnswer, setShowAnswer] = useState(false);
     const [result, setResult] = useState(false);
-    const [statusArr, setStatusArr] = useState(new Array(timeline.length).fill(-1));
+    const [statusArr, setStatusArr] = useState([]);
+
+    const intervalRef = useRef(null);
+    const nextButton2 = useRef(null);
+    const contextDictRef = useRef(null);
+    const answerContainerRef = useRef(null);
+    const inputRef = useRef(null);
+
     const isPopupOpen = useSelector((state) => state.submitPopup.isOpen);
+    const isUserLogin = useSelector((state) => state.appState.isLogined);
+    const contextDict = useSelector((state) => state.dictState);
+
+    useEffect(() => {
+        if (resultArr) {
+            setStatusArr(resultArr);
+        }
+    }, [resultArr]);
 
     useEffect(() => {
         if (video.current) {
             if (play) {
                 const startIdx = idx > 0 ? idx - 1 : 0;
                 const currentTime = video.current.getCurrentTime();
-                if (!(currentTime >= timeline[startIdx] && currentTime < timeline[idx]))
+                if (
+                    !(
+                        currentTime >= timeline[startIdx] &&
+                        currentTime < timeline[idx]
+                    )
+                )
                     video.current.seekTo(timeline[startIdx]);
                 intervalRef.current = setInterval(() => {
                     // console.log(
@@ -126,7 +174,13 @@ const Dictation = (props) => {
         if (next) {
             pauseVideo();
             if (idx < timeline.length - 1) setIdx((state) => state + 1);
-            else setIdx(timeline.length - 1);
+            else {
+                handleSubmit();
+                return;
+            }
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
         }
     }, [next]);
 
@@ -173,7 +227,7 @@ const Dictation = (props) => {
     };
 
     const nextQuestion = () => {
-        setInput("");
+        if (idx) setInput("");
         setResult(false);
         hideAnswerContainer();
         setNext(true);
@@ -201,11 +255,18 @@ const Dictation = (props) => {
     };
 
     useEffect(() => {
+        return () => {
+            dispatch(resetDict());
+        };
+    }, []);
+
+    useEffect(() => {
         // console.log("Show answer" + showAnswer);
     }, [showAnswer]);
 
     useEffect(() => {
         if (result) {
+            // if result's right, focus to the next question button
             if (nextButton2.current) {
                 nextButton2.current.focus();
             }
@@ -225,7 +286,7 @@ const Dictation = (props) => {
             setResult(true);
             setStatusArr((state) => {
                 const newState = [...state];
-                newState[idx] = 1;
+                newState[idx - 1] = 1;
                 return newState;
             });
         } else {
@@ -234,7 +295,7 @@ const Dictation = (props) => {
             setStatusArr((state) => {
                 if (state[idx] === 1) return state;
                 const newState = [...state];
-                newState[idx] = 0;
+                newState[idx - 1] = 0;
                 return newState;
             });
         }
@@ -243,7 +304,7 @@ const Dictation = (props) => {
     };
 
     const returnCorrectStatus = () => {
-        switch (statusArr[idx]) {
+        switch (statusArr[idx - 1]) {
             case 0:
                 return "incorrect";
             case 1:
@@ -255,144 +316,215 @@ const Dictation = (props) => {
         dispatch(openPopup());
     };
 
+    const handleContextDictionary = (e, clickedWord) => {
+        // console.log(contextDictRef.current.getBoundingClientRect());
+        // console.log(e.pageX);
+        // console.log(e.pageY);
+        // console.log(e.target);
+        const clickedItemRect = e.target.getBoundingClientRect();
+        const dictRect = contextDictRef.current.getBoundingClientRect();
+
+        dispatch(
+            openDict({
+                x: e.pageX - dictRect.width / 2 + clickedItemRect.width / 2,
+                y: e.pageY + clickedItemRect.height + 3,
+                selectedWord: clickedWord,
+            })
+        );
+    };
+
+    const generateAnswerSpans = () => {
+        // console.log("width = " + answerCont  ainerRef.current.style.width);
+        const answer = sentences[idx - 1];
+        if (answer) {
+            let answerSpan = answer.split(" ");
+            return (
+                <>
+                    {answerSpan.map((item, idx) => (
+                        <>
+                            <SpanWithDictionary
+                                text={item}
+                                key={idx}
+                                onClick={(e) =>
+                                    handleContextDictionary(e, item)
+                                }
+                            ></SpanWithDictionary>
+                        </>
+                    ))}
+                </>
+            );
+        }
+        return "No answer";
+    };
+
     return (
         <>
-            <div className="dictation-container">
-                <div className="left-section">
-                    <Youtube
-                        videoId={videoID || ''}
-                        className="video-container"
-                        onReady={(e) => onReady(e)}
-                        opts={{
-                            width: "100%",
-                            height: "100%",
-                        }}
-                        onPlay={() => {
-                            // findNearestIdx();
-                            setPlay(true);
-                        }}
-                        onPause={() => {
-                            setPlay(false);
-                        }}
-                        onEnd={() => {
-                            setPlay(false);
-                        }}
-                    ></Youtube>
-                </div>
-                <div className="right-section">
-                    <div className="control-container">
-                        <FaArrowRotateLeft
-                            id="replay-button"
-                            onClick={() => replayQuestion()}
-                        ></FaArrowRotateLeft>
-
-                        <div className="middle-section">
-                            <IoIosArrowBack
-                                id="back-button"
-                                onClick={() => backToPreviousQuestion()}
-                            ></IoIosArrowBack>
-                            <div id="question-info">
-                                Question: {idx}/{noOfQuestions}
-                            </div>
-                            <IoIosArrowForward
-                                id="next-button"
-                                onClick={() => {
-                                    nextQuestion();
+            {isUserLogin ? (
+                <>
+                    {" "}
+                    <div className={styles["dictation-container"]}>
+                        <div className={styles["left-section"]}>
+                            <Youtube
+                                videoId={youtubeID || ""}
+                                className={styles["video-container"]}
+                                onReady={(e) => onReady(e)}
+                                opts={{
+                                    width: "100%",
+                                    height: "100%",
                                 }}
-                            ></IoIosArrowForward>
+                                onPlay={() => {
+                                    // findNearestIdx();
+                                    setPlay(true);
+                                }}
+                                onPause={() => {
+                                    setPlay(false);
+                                }}
+                                onEnd={() => {
+                                    setPlay(false);
+                                }}
+                            ></Youtube>
                         </div>
-                        <div
-                            className={`question-status ${returnCorrectStatus()}`}
-                        >
-                            {statusStr[statusArr[idx] + 1]}
+                        <div className={styles["right-section"]}>
+                            <div className={styles["control-container"]}>
+                                <FaArrowRotateLeft
+                                    className={styles['replay-button']}
+                                    onClick={() => replayQuestion()}
+                                ></FaArrowRotateLeft>
+
+                                <div className={styles["middle-section"]}>
+                                    <IoIosArrowBack
+                                        className={styles["back-button"]}
+                                        onClick={() => backToPreviousQuestion()}
+                                    ></IoIosArrowBack>
+                                    <div className={styles["question-info"]}>
+                                        Question: {idx}/{noOfQuestions}
+                                    </div>
+                                    <IoIosArrowForward
+                                        className={styles["next-button"]}
+                                        onClick={() => {
+                                            nextQuestion();
+                                        }}
+                                    ></IoIosArrowForward>
+                                </div>
+                                <div
+                                    className={`${styles['question-status']} ${styles[returnCorrectStatus()]}`}
+                                >
+                                    {statusStr[statusArr[idx - 1] + 1]}
+                                </div>
+                            </div>
+
+                            <textarea
+                                className={styles["input-area"]}
+                                value={input}
+                                placeholder="Enter your answer here..."
+                                rows={4}
+                                ref={inputRef}
+                                accessKey="Enter"
+                                onChange={(e) => handleInput(e)}
+                                onKeyDown={(e) => handleOnKeyDownInput(e)}
+                            />
+
+                            {showAnswer ? (
+                                <>
+                                    <div className={styles["answer-container"]}>
+                                        <div className={styles["answer-title"]}>
+                                            Answer
+                                        </div>
+                                        <div
+                                            ref={answerContainerRef}
+                                            className={`${
+                                                styles["answer-textarea"]} 
+                                                ${styles[
+                                                result
+                                                    ? "correct-answer"
+                                                    : "wrong-answer"
+                                            ]}`}
+                                        >
+                                            {generateAnswerSpans()}
+                                            {/* test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test */}
+                                        </div>
+                                    </div>
+                                    {result ? (
+                                        <button
+                                            className={styles["next-button2"]}
+                                            ref={nextButton2}
+                                            onClick={() => {
+                                                nextQuestion();
+                                            }}
+                                        >
+                                            Next
+                                        </button>
+                                    ) : (
+                                        <button
+                                        className={styles["skip-button2"]}
+                                            onClick={() => {
+                                                nextQuestion();
+                                            }}
+                                        >
+                                            Skip
+                                        </button>
+                                    )}
+                                    <ContextDictionary
+                                        contextDictRef={contextDictRef}
+                                        isToggled={contextDict.toggled}
+                                        positionX={contextDict.position.x}
+                                        positionY={contextDict.position.y}
+                                    ></ContextDictionary>
+                                </>
+                            ) : (
+                                <>
+                                    <div className={styles["check-option-container"]}>
+                                        <button className={`${styles["check-button"]} ${styles["invisible-button"]}`}>
+                                            check
+                                        </button>
+                                        <div
+                                            className={styles["skip-button"]}
+                                            onClick={() =>
+                                                showAnswerContainer()
+                                            }
+                                        >
+                                            Skip
+                                        </div>
+                                        <button
+                                            className={styles["check-button"]}
+                                            onClick={() => {
+                                                // showAnswerContainer();
+                                                handleCheckResult();
+                                            }}
+                                        >
+                                            Check
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+
+                            <button
+                                className={styles["submit-button"]}
+                                onClick={() => {
+                                    handleSubmit();
+                                }}
+                            >
+                                Submit
+                            </button>
                         </div>
                     </div>
-
-                    <textarea
-                        className="input-area"
-                        value={input}
-                        placeholder="Enter your answer here..."
-                        rows={4}
-                        accessKey="Enter"
-                        onChange={(e) => handleInput(e)}
-                        onKeyDown={(e) => handleOnKeyDownInput(e)}
-                    />
-
-                    {showAnswer ? (
+                    {isPopupOpen && (
                         <>
-                            <div className="answer-container">
-                                <div className="answer-title">Answer</div>
-                                <textarea
-                                    className={`answer-textarea ${
-                                        result
-                                            ? "correct-answer"
-                                            : "wrong-answer"
-                                    }`}
-                                    readOnly
-                                    value={sentences[idx - 1]}
-                                />
-                            </div>
-                            {result ? (
-                                <button
-                                    id="next-button2"
-                                    ref={nextButton2}
-                                    onClick={() => {
-                                        nextQuestion();
-                                    }}
-                                >
-                                    Next
-                                </button>
-                            ) : (
-                                <button
-                                    id="skip-button2"
-                                    onClick={() => {
-                                        nextQuestion();
-                                    }}
-                                >
-                                    Skip
-                                </button>
-                            )}
-                        </>
-                    ) : (
-                        <>
-                            <div className="check-option-container">
-                                <button className="check-button invisible-button">
-                                    check
-                                </button>
-                                <div
-                                    id="skip-button"
-                                    onClick={() => showAnswerContainer()}
-                                >
-                                    Skip
-                                </div>
-                                <button
-                                    className="check-button"
-                                    onClick={() => {
-                                        // showAnswerContainer();
-                                        handleCheckResult();
-                                    }}
-                                >
-                                    Check
-                                </button>
-                            </div>
+                            <DictationExContext.Provider
+                                value={{ statusArr, videoID: id, videoType }}
+                            >
+                                <SubmitPopup></SubmitPopup>
+                            </DictationExContext.Provider>
                         </>
                     )}
-
-                    <button
-                        id="submit-button"
-                        onClick={() => {
-                            handleSubmit();
-                        }}
-                    >
-                        Submit
-                    </button>
+                </>
+            ) : (
+                <div>
+                    Please <Link to="/login">login</Link> to do this exercise
                 </div>
-            </div>
-
-            {isPopupOpen && <SubmitPopup></SubmitPopup>}
+            )}
         </>
     );
 };
 
-export default Dictation;
-export { loader, action };
+export { Dictation, loader, action, DictationExContext };

@@ -20,6 +20,10 @@
     user-select: none; /* prevent the title highlighted */
 }
 
+#setting-button {
+    position: relative;
+}
+
 #side-menu-icon,
 #setting-icon {
     height: 35px;
@@ -54,4 +58,6 @@
 
 #dictation-navigation {
     cursor: pointer;
+    padding: 0 5px;
 }
+

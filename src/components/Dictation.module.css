@@ -33,13 +33,13 @@
 }
 
 
-#replay-button {
+.replay-button {
     width: 30px;
     cursor: pointer;
     justify-self: start;
 }
 
-#question-info {
+.question-info {
     display: flex;
     align-items: center;
     padding: 0 16px;
@@ -47,8 +47,8 @@
     font-size: 1.2rem;
 }
 
-#next-button,
-#back-button {
+.next-button,
+.back-button {
     width: 26px;
     cursor: pointer;
     height: 26px;
@@ -57,8 +57,8 @@
     user-select: none;
 }
 
-#next-button:hover,
-#back-button:hover
+.next-button:hover,
+.back-button:hover
 {
     background-color: rgb(224, 224, 224);
 }
@@ -81,12 +81,12 @@
 }
 
 .check-button,
-#skip-button {
+.skip-button {
     cursor: pointer;
     padding: 6px 20px;
 }
 
-#skip-button:hover
+.skip-button:hover
 {
     text-decoration: underline;
 }
@@ -100,6 +100,7 @@
 
 .answer-container
 {
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -111,8 +112,10 @@
 
 .answer-textarea
 {
-    resize: none;
+    width: 100%;
     outline:none;
+    display: flex;
+    flex-wrap: wrap;
     height: fit-content;
     padding: 10px;
     font-size: 1rem;
@@ -128,7 +131,10 @@
     border: 2px solid rgb(10, 209, 10);
 }
 
-#next-button2, #skip-button2
+
+
+
+.next-button2, .skip-button2
 {
     margin-top: 5px;
     cursor: pointer;
@@ -150,7 +156,7 @@
     color: red;
 }
 
-#submit-button
+.submit-button
 {
     margin-top: 50px;
     flex-grow: 0;

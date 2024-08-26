@@ -1,0 +1,30 @@
+.item-container {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgb(212, 212, 212);
+    padding: 12px 10px;
+    height: 200px;
+}
+
+.item-title {
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    line-height: 1.2;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+.item-metadata
+{
+    margin-bottom: 2px;
+}
+
+.start-button
+{
+    margin-top: auto;
+}

@@ -1,0 +1,43 @@
+.setting-drop-menu {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    width: 200px;
+    padding: 10px 5px;
+    height: 0;
+    transition: height 500ms;
+    border: 1px solid rgb(205, 205, 205);
+    display: flex;
+    background-color: white;
+    border-radius: 5px;
+    cursor: auto;
+    flex-direction: column;
+    visibility: hidden;
+    overflow: hidden;
+}
+
+.setting-drop-menu.visible {
+    height: 150px;
+    visibility: visible;
+}
+
+
+.unstyled-link {
+    text-decoration: none;
+    color: #000;
+}
+
+
+
+.setting-menu-item {
+    padding: 5px 3px;
+    cursor: pointer;
+}
+
+.setting-menu-item:hover {
+    background-color: rgb(241, 241, 241);
+}
+
+.setting-menu-item:active {
+    background-color: rgb(211, 211, 211);
+}
