@@ -1,24 +1,53 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { Form, redirect, useLoaderData, useSubmit } from "react-router-dom";
 import { TestQuestion } from "./TestQuestion";
 import styles from "./TestPractice.module.css";
+import { v4 as uuidv4 } from "uuid";
+
 import {
     convertPixelSizeToNumber,
     convertSecondsToTime,
 } from "../helper_function/handleInput";
+import SubmitPopup from "./SubmitPopup";
 const apiURL = import.meta.env.VITE_API_URL;
+
 const loader = async ({ request, params }) => {
     const url = new URL(request.url);
+    console.log("start load");
     const response = await axios.get(
         `${apiURL}/tests/foo/${params.id}${url.search}`
     );
+    console.log("end load");
     const data = response.data;
     if (data.result) {
         console.log(data.data);
         return data.data;
     }
     console.log("No test practice");
+    return null;
+};
+
+const action = async ({ request, params }) => {
+    console.log("action");
+    const formData = await request.formData();
+    formData.append("historyID", uuidv4());
+    const token = localStorage.getItem("jwt_token");
+    const submitResponse = await axios.post(
+        `${apiURL}/test/practice/save-test-result`,
+        formData,
+        {
+            headers: { Authorization: `Bearer ${token || "no_token"}` },
+        }
+    );
+    if(submitResponse.data.result)
+    {
+        return redirect(`/tests/${params.id}`);
+    }
+    else
+    {
+        alert("There's something wrong");
+    }
     return null;
 };
 
@@ -32,12 +61,26 @@ const TestPractice = () => {
     const questionSection = useRef(null);
     const answerSection = useRef(null);
     const resizeBar = useRef(null);
+    const [questionMark, setQuestionMark] = useState({});
     const containerRef = useRef(null);
+    const formRef = useRef(null);
+    const startingTimeRef = useRef(null);
+
+    const submit = useSubmit();
+
     useEffect(() => {
         if (parts && parts.length > 0) {
-            setCurrentPart(parts[0]);
+            setCurrentPart(currentPart || parts[0]); // prevent switching currentPart when loader loads data.
         }
     }, [parts]);
+
+    useEffect(() => {
+        if (questions && questions.length > 0) {
+            const obj = {};
+            questions.forEach((item) => (obj[item.id] = false));
+            setQuestionMark(obj);
+        }
+    }, questions);
 
     useEffect(() => {
         if (resizeBar) {
@@ -84,12 +127,18 @@ const TestPractice = () => {
             return () => {
                 document.removeEventListener("mousemove", resize);
                 document.removeEventListener("mouseup", stopResize);
-                resizeBar.current.remove("mousedown", listenToSizeChange);
+                if (resizeBar.current)
+                    resizeBar.current.removeEventListener(
+                        "mousedown",
+                        listenToSizeChange
+                    );
             };
         }
     }, [resizeBar]);
 
     useEffect(() => {
+        startingTimeRef.current = new Date(Date.now());
+        console.log(startingTimeRef.current);
         const timeInterval = setInterval(() => {
             second.current++;
             setTiming(convertSecondsToTime(second.current));
@@ -100,9 +149,45 @@ const TestPractice = () => {
         };
     }, []);
 
+    const sendResult = () => {
+        const confirmed = window.confirm(
+            "Are you sure you want to submit the test?"
+        );
+        if (confirmed) {
+            if (formRef.current) {
+                const formData = new FormData(formRef.current);
+                for (const entry of formData.entries()) {
+                    console.log(entry);
+                }
+                submit(formData, { method: "POST" });
+            }
+        }
+    };
+
+    const getPartOrderJSONArr = () => {
+        if (parts) {
+            const arr = [];
+            parts.forEach((part) => arr.push(part.partOrder));
+            return JSON.stringify(arr);
+        }
+        return "";
+    };
+
+    const generateSQLTimestamp = () => {
+        if (startingTimeRef.current) {
+            return startingTimeRef.current
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ");
+        }
+        return "";
+    };
+
+    const handleSubmit = (event) => {};
+
     return (
         <>
-            <div className={styles["test-title"]}>{test.title}</div>
+            <div className={styles["test-title"]}>{test.title || ""}</div>
             <div className={styles["container"]}>
                 <div className={styles["test-side"]} ref={containerRef}>
                     <div
@@ -149,56 +234,107 @@ const TestPractice = () => {
                         // style={{ flexBasis: '0%' }}
                         ref={answerSection}
                     >
-                        {currentPart &&
-                            sections &&
-                            sections.length > 0 &&
-                            sections.map((section) => (
-                                <>
-                                    <div
-                                        className={`${
-                                            styles["section-container"]
-                                        } ${
-                                            section.partOrder ===
-                                            currentPart.partOrder
-                                                ? styles["active"]
-                                                : ""
-                                        }`}
-                                    >
-                                        <div>
-                                            Section:{" "}
-                                            {section.sectionOrder ||
-                                                "NULL SECTION ORDER"}
+                        <Form ref={formRef}>
+                            <input
+                                type="hidden"
+                                name="testID"
+                                value={(test && test.id) || ""}
+                            />
+                            <input
+                                type="hidden"
+                                name="partArr"
+                                value={getPartOrderJSONArr()}
+                            />
+                            <input
+                                type="hidden"
+                                name="startingTime"
+                                value={generateSQLTimestamp()}
+                            />
+                            <input
+                                type="hidden"
+                                name="duration"
+                                value={second.current || 0}
+                            />
+                            {currentPart &&
+                                sections &&
+                                sections.length > 0 &&
+                                sections.map((section) => (
+                                    <>
+                                        <div
+                                            className={`${
+                                                styles["section-container"]
+                                            } ${
+                                                section.partOrder ===
+                                                currentPart.partOrder
+                                                    ? styles["active"]
+                                                    : ""
+                                            }`}
+                                        >
+                                            <div>
+                                                Section:{" "}
+                                                {section.sectionOrder ||
+                                                    "NULL SECTION ORDER"}
+                                            </div>
+                                            <div>
+                                                {section.title ||
+                                                    "NULL SECTION TITLE"}
+                                            </div>
+                                            <div>
+                                                {section.sectionGuide ||
+                                                    "NULL SECTION GUIDE"}
+                                            </div>
+                                            {questions &&
+                                                questions.length > 0 &&
+                                                questions
+                                                    .filter(
+                                                        (question) =>
+                                                            question.sectionOrder ===
+                                                                section.sectionOrder &&
+                                                            question.partOrder ===
+                                                                section.partOrder
+                                                    )
+                                                    .map((question) => (
+                                                        <>
+                                                            <TestQuestion
+                                                                onClick={() => {
+                                                                    setQuestionMark(
+                                                                        (
+                                                                            state
+                                                                        ) => {
+                                                                            const newState =
+                                                                                {
+                                                                                    ...state,
+                                                                                };
+                                                                            newState[
+                                                                                question.id
+                                                                            ] =
+                                                                                !newState[
+                                                                                    question
+                                                                                        .id
+                                                                                ];
+                                                                            return newState;
+                                                                        }
+                                                                    );
+                                                                }}
+                                                                className={
+                                                                    questionMark[
+                                                                        question
+                                                                            .id
+                                                                    ]
+                                                                        ? "book-mark"
+                                                                        : ""
+                                                                }
+                                                                question={
+                                                                    question
+                                                                }
+                                                                id={`question-${question.id}`}
+                                                            ></TestQuestion>
+                                                        </>
+                                                    ))}
                                         </div>
-                                        <div>
-                                            {section.title ||
-                                                "NULL SECTION TITLE"}
-                                        </div>
-                                        <div>
-                                            {section.sectionGuide ||
-                                                "NULL SECTION GUIDE"}
-                                        </div>
-
-                                        {questions &&
-                                            questions.length > 0 &&
-                                            questions
-                                                .filter(
-                                                    (question) =>
-                                                        question.sectionOrder ===
-                                                            section.sectionOrder &&
-                                                        question.partOrder ===
-                                                            section.partOrder
-                                                )
-                                                .map((question) => (
-                                                    <>
-                                                        <TestQuestion
-                                                            question={question}
-                                                            id={`question-${question.id}`}
-                                                        ></TestQuestion>
-                                                    </>
-                                                ))}
-                                    </div>
-                                </>
-                            ))}
+                                    </>
+                                ))}
+                        </Form>
                     </div>
                 </div>
                 <div className={styles["control-side"]}>
@@ -226,11 +362,19 @@ const TestPractice = () => {
                                             )
                                             .map((question) => (
                                                 <div
-                                                    className={
+                                                    className={`${
                                                         styles[
                                                             "question-nav-button"
                                                         ]
-                                                    }
+                                                    } ${
+                                                        questionMark[
+                                                            question.id
+                                                        ]
+                                                            ? styles[
+                                                                  "book-mark"
+                                                              ]
+                                                            : ""
+                                                    }`}
                                                     data-question-id={`question-${question.id}`}
                                                     data-part-order={
                                                         part.partOrder
@@ -243,7 +387,6 @@ const TestPractice = () => {
                                                             ) ===
                                                             currentPart.partOrder
                                                         ) {
-                                                            console.log("Same");
                                                         } else {
                                                             setCurrentPart(
                                                                 parts.find(
@@ -257,9 +400,9 @@ const TestPractice = () => {
                                                                         )
                                                                 )
                                                             );
-                                                            console.log(
-                                                                "Not same"
-                                                            );
+                                                            // console.log(
+                                                            //     "Not same"
+                                                            // );
                                                         }
                                                         // console.log(
                                                         //     e.target.dataset
@@ -268,21 +411,22 @@ const TestPractice = () => {
                                                             document.querySelector(
                                                                 `#${e.target.dataset.questionId}`
                                                             );
+                                                        setTimeout(() => {
+                                                            question.scrollIntoView(
+                                                                {
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                    behavior:
+                                                                        "smooth",
+                                                                }
+                                                            );
+                                                            question.style.outline =
+                                                                "2px solid yellow";
                                                             setTimeout(() => {
-                                                                question.scrollIntoView(
-                                                                    {
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                        behavior:
-                                                                            "smooth",
-                                                                    }
-                                                                );
-                                                                question.style.outline = "2px solid yellow";
-                                                                setTimeout(() => {
-                                                                    question.style.outline = "none";
-                                                                }, 1000)        
-                                                            }, 25);
-                                                        
+                                                                question.style.outline =
+                                                                    "none";
+                                                            }, 1000);
+                                                        }, 25);
                                                     }}
                                                 >
                                                     {question.questionOrder}
@@ -292,11 +436,17 @@ const TestPractice = () => {
                                 </>
                             ))}
                     </div>
-                    <button className={styles["submit-button"]}>Submit</button>
+                    <button
+                        className={styles["submit-button"]}
+                        onClick={() => sendResult()}
+                    >
+                        Submit
+                    </button>
                 </div>
             </div>
+            {/* <SubmitPopup></SubmitPopup> */}
         </>
     );
 };
 
-export { TestPractice, loader };
+export { TestPractice, loader, action };

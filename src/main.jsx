@@ -24,7 +24,7 @@ import { AuthenticCheck } from "./components/AuthenticCheck.jsx";
 import {ErrorComponent} from "./components/ErrorComponent.jsx";
 import { Tests, loader as testLoader } from "./components/Tests.jsx";
 import { TestDetail, loader as testDetailLoader, action as testDetailAction } from "./components/TestDetail.jsx";
-import { TestPractice, loader as testPracticeLoader } from "./components/TestPractice.jsx";
+import { TestPractice, loader as testPracticeLoader, action as testPracticeAction } from "./components/TestPractice.jsx";
 
 const router = createBrowserRouter([
     {
@@ -55,6 +55,7 @@ const router = createBrowserRouter([
                 path: "tests/practice/:id",
                 element: <TestPractice/>,
                 loader: testPracticeLoader,
+                action: testPracticeAction,
             },
             {
                 path: "tests/:id",

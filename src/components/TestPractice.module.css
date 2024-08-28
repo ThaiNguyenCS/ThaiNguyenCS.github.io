@@ -95,6 +95,11 @@
     background-color: rgb(197, 197, 197);
 }
 
+.question-nav-button.book-mark
+{
+    background-color: yellow;
+}
+
 .submit-button{
     width: max(150px, 40%);
     flex-basis: 30px;
