@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 const apiURL = import.meta.env.VITE_API_URL;
 import axios from "axios";
 import styles from "./TestDetail.module.css";
-import { Form, redirect, useLoaderData } from "react-router-dom";
-
-const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+import { Form, Link, redirect, useLoaderData } from "react-router-dom";
+import { getFormatDate } from "../helper_function/handleInput";
 
 const loader = async ({ params }) => {
     const token = localStorage.getItem("jwt_token");
@@ -49,7 +48,25 @@ const action = async ({ request, params }) => {
 
 const TestDetail = () => {
     const { test, testHistories } = useLoaderData();
+    const [checkBoxStatus, setCheckBoxStatus] = useState([]);
+    const [canSubmit, setCanSubmit] = useState(false);
 
+    useEffect(() => {
+        if(test && test.length > 0)
+        {
+            setCheckBoxStatus(new Array(test.length).fill(false));
+        }
+    }, [test])
+
+    useEffect(() => {
+        if(checkBoxStatus.length > 0)
+        {
+            console.log(checkBoxStatus);
+            const isValid = checkBoxStatus.some(box => box);
+            setCanSubmit(isValid);
+        }
+    }, [checkBoxStatus])
+    
     const getDurationStrFromSecond =  (second) => {
         const minute = Math.trunc(second / 60);
         const hour = Math.trunc(minute / 60);
@@ -57,16 +74,20 @@ const TestDetail = () => {
         return `${hour.toString().padStart(1, '0')}:${minute.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
     }
 
-    const getFormatDate = (dateStr) => {
-        const date = new Date(dateStr);
-        return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date.getHours().toString().padStart(2, 0)}:${date.getMinutes().toString().padStart(2, 0)}:${date.getSeconds().toString().padStart(2, 0)}`;
-    }
-
     const getPartStr = (partJSON) => 
     {
         let partArr = JSON.parse(partJSON);
         return partArr.join(", ");
     }
+
+    const updateCheckboxStatus = (idx) => {
+        console.log("update " + idx);
+        let newStatus = [...checkBoxStatus];
+        newStatus[idx] = !newStatus[idx];
+        setCheckBoxStatus(newStatus);
+    }
+
+
 
     return (
         <>
@@ -77,6 +98,7 @@ const TestDetail = () => {
                         <th>Parts</th>
                         <th>Duration</th>
                         <th>Result</th>
+                        <th>Details</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,6 +114,7 @@ const TestDetail = () => {
                                         {history.noOfCorrectQuestions}/
                                         {history.totalQuestions}
                                     </td>
+                                    <td><Link to={`/tests/${history.testID}/result/${history.id}`}>Review</Link></td>
                                 </tr>
                             </>
                         ))}
@@ -108,10 +131,12 @@ const TestDetail = () => {
                                 type="checkbox"
                                 name="part"
                                 value={item.partOrder}
+                                checked={checkBoxStatus[idx]}
+                                onChange={() => {updateCheckboxStatus(idx);}}
                             />
                         </>
                     ))}
-                <button type="submit">Do it!</button>
+                <button type="submit" disabled={!canSubmit}>Do it!</button>
             </Form>
         </>
     );

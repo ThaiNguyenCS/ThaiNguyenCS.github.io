@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Form, redirect, useLoaderData, useSubmit } from "react-router-dom";
 import { TestQuestion } from "./TestQuestion";
 import styles from "./TestPractice.module.css";
@@ -8,6 +8,8 @@ import { v4 as uuidv4 } from "uuid";
 import {
     convertPixelSizeToNumber,
     convertSecondsToTime,
+    getPartOrderJSONArr,
+    generateSQLTimestamp,
 } from "../helper_function/handleInput";
 import SubmitPopup from "./SubmitPopup";
 const apiURL = import.meta.env.VITE_API_URL;
@@ -15,9 +17,7 @@ const apiURL = import.meta.env.VITE_API_URL;
 const loader = async ({ request, params }) => {
     const url = new URL(request.url);
     console.log("start load");
-    const response = await axios.get(
-        `${apiURL}/tests/foo/${params.id}${url.search}`
-    );
+    const response = await axios.get(`${apiURL}/tests/foo/${params.id}${url.search}`);
     console.log("end load");
     const data = response.data;
     if (data.result) {
@@ -31,22 +31,17 @@ const loader = async ({ request, params }) => {
 const action = async ({ request, params }) => {
     console.log("action");
     const formData = await request.formData();
-    formData.append("historyID", uuidv4());
+    const historyID = uuidv4();
+    formData.append("historyID", historyID);
     const token = localStorage.getItem("jwt_token");
-    const submitResponse = await axios.post(
-        `${apiURL}/test/practice/save-test-result`,
-        formData,
-        {
-            headers: { Authorization: `Bearer ${token || "no_token"}` },
-        }
-    );
-    if(submitResponse.data.result)
-    {
-        return redirect(`/tests/${params.id}`);
-    }
-    else
-    {
-        alert("There's something wrong");
+    const submitResponse = await axios.post(`${apiURL}/test/practice/save-test-result`, formData, {
+        headers: { Authorization: `Bearer ${token || "no_token"}` },
+    });
+    if (submitResponse.data.result) {
+        // database storage result
+        return redirect(`/test/${params.id}/result/${historyID}`);
+    } else {
+        alert("There's something wrong. Your test will not be saved!");
     }
     return null;
 };
@@ -77,7 +72,9 @@ const TestPractice = () => {
     useEffect(() => {
         if (questions && questions.length > 0) {
             const obj = {};
-            questions.forEach((item) => (obj[item.id] = false));
+            questions.forEach((item) => {
+                obj[item.id] = { value: "", isMarked: false };
+            });
             setQuestionMark(obj);
         }
     }, questions);
@@ -93,25 +90,17 @@ const TestPractice = () => {
             console.log(questionSection.current.getBoundingClientRect());
             function resize(e) {
                 console.log(e.clientX); // e.clientX is the position in the middle of the resize bar
-                const leftBoundary =
-                    questionSection.current.getBoundingClientRect().left;
-                const rightBoundary =
-                    answerSection.current.getBoundingClientRect().right;
-                if (
-                    e.clientX + 50 > rightBoundary ||
-                    e.clientX - 50 < leftBoundary
-                )
-                    return;
+                const leftBoundary = questionSection.current.getBoundingClientRect().left;
+                const rightBoundary = answerSection.current.getBoundingClientRect().right;
+                if (e.clientX + 50 > rightBoundary || e.clientX - 50 < leftBoundary) return;
                 // console.log("container Width " + (rightBoundary-leftBoundary));
                 const containerWidth = rightBoundary - leftBoundary;
-                const leftWidth =
-                    e.clientX - leftBoundary - totalResizeBarWidth / 2;
-                const rightWidth =
-                    containerWidth - leftWidth - totalResizeBarWidth;
+                const leftWidth = e.clientX - leftBoundary - totalResizeBarWidth / 2;
+                const rightWidth = containerWidth - leftWidth - totalResizeBarWidth;
                 questionSection.current.style.flexBasis = leftWidth + "px";
                 answerSection.current.style.flexBasis = rightWidth + "px";
-                console.log("leftWidth " + leftWidth);
-                console.log("rightWidth " + rightWidth);
+                // console.log("leftWidth " + leftWidth);
+                // console.log("rightWidth " + rightWidth);
             }
 
             function stopResize() {
@@ -127,11 +116,7 @@ const TestPractice = () => {
             return () => {
                 document.removeEventListener("mousemove", resize);
                 document.removeEventListener("mouseup", stopResize);
-                if (resizeBar.current)
-                    resizeBar.current.removeEventListener(
-                        "mousedown",
-                        listenToSizeChange
-                    );
+                if (resizeBar.current) resizeBar.current.removeEventListener("mousedown", listenToSizeChange);
             };
         }
     }, [resizeBar]);
@@ -150,9 +135,7 @@ const TestPractice = () => {
     }, []);
 
     const sendResult = () => {
-        const confirmed = window.confirm(
-            "Are you sure you want to submit the test?"
-        );
+        const confirmed = window.confirm("Are you sure you want to submit the test?");
         if (confirmed) {
             if (formRef.current) {
                 const formData = new FormData(formRef.current);
@@ -164,26 +147,53 @@ const TestPractice = () => {
         }
     };
 
-    const getPartOrderJSONArr = () => {
-        if (parts) {
-            const arr = [];
-            parts.forEach((part) => arr.push(part.partOrder));
-            return JSON.stringify(arr);
+    const generateTableSections = (sections) => {
+        const holder = [];
+        for (let s = 0; s < sections.length; s++) {
+            if (sections[s].sectionType === "table") {
+                const tableCellArr = JSON.parse(sections[s].tableCells);
+                console.log(tableCellArr);
+                const noOfColumns = sections[s].noOfColumns;
+                let noOfRows = tableCellArr.length / noOfColumns;
+                const tableRows = [];
+                for (let i = 0; i < noOfRows; i++) {
+                    const tableColumns = [];
+                    for (let j = 0; j < noOfColumns; j++) {
+                        tableColumns.push(tableCellArr[i * noOfColumns + j]);
+                    }
+                    tableRows.push(tableColumns);
+                }
+                holder.push({
+                    id: sections[s].id,
+                    htmlCode: (
+                        <>
+                            <table>
+                                <tbody>
+                                    {tableRows.map((row) => (
+                                        <tr>
+                                            {row.map((cell) => (
+                                                <td>{cell}</td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </>
+                    ),
+                });
+            }
         }
-        return "";
+        return holder;
     };
 
-    const generateSQLTimestamp = () => {
-        if (startingTimeRef.current) {
-            return startingTimeRef.current
-                .toISOString()
-                .slice(0, 19)
-                .replace("T", " ");
-        }
-        return "";
-    };
+    const tables = useMemo(() => generateTableSections(sections), [sections]);
 
-    const handleSubmit = (event) => {};
+    const handleInputChange = (e, id) => {
+        console.log(e.target.value);
+        const newState = { ...questionMark };
+        newState[id].input = e.target.value;
+        setQuestionMark(newState);
+    };
 
     return (
         <>
@@ -200,30 +210,14 @@ const TestPractice = () => {
                             parts.map((part) => (
                                 <>
                                     <div
-                                        className={`${
-                                            styles["part-container"]
-                                        } ${
-                                            part === currentPart
-                                                ? styles["active"]
-                                                : ""
+                                        className={`${styles["part-container"]} ${
+                                            part === currentPart ? styles["active"] : ""
                                         }`}
                                     >
-                                        <div>
-                                            Part:{" "}
-                                            {part.partOrder ||
-                                                "NULL PART ORDER"}
-                                        </div>
-                                        <div>
-                                            {part.title || "NULL PART TITLE"}
-                                        </div>
-                                        <div>
-                                            {part.partGuide ||
-                                                "NULL PART GUIDE"}
-                                        </div>
-                                        <div>
-                                            {part.partContent ||
-                                                "NULL PART CONTENT"}
-                                        </div>
+                                        <div>Part: {part.partOrder || "NULL PART ORDER"}</div>
+                                        <div>{part.title || "NULL PART TITLE"}</div>
+                                        <div>{part.partGuide || "NULL PART GUIDE"}</div>
+                                        <div>{part.partContent || "NULL PART CONTENT"}</div>
                                     </div>
                                 </>
                             ))}
@@ -235,99 +229,62 @@ const TestPractice = () => {
                         ref={answerSection}
                     >
                         <Form ref={formRef}>
-                            <input
-                                type="hidden"
-                                name="testID"
-                                value={(test && test.id) || ""}
-                            />
-                            <input
-                                type="hidden"
-                                name="partArr"
-                                value={getPartOrderJSONArr()}
-                            />
+                            <input type="hidden" name="testID" value={(test && test.id) || ""} />
+                            <input type="hidden" name="partArr" value={getPartOrderJSONArr(parts)} />
                             <input
                                 type="hidden"
                                 name="startingTime"
-                                value={generateSQLTimestamp()}
+                                value={generateSQLTimestamp(startingTimeRef.current)}
                             />
-                            <input
-                                type="hidden"
-                                name="duration"
-                                value={second.current || 0}
-                            />
+                            <input type="hidden" name="duration" value={second.current || 0} />
                             {currentPart &&
                                 sections &&
                                 sections.length > 0 &&
                                 sections.map((section) => (
                                     <>
                                         <div
-                                            className={`${
-                                                styles["section-container"]
-                                            } ${
-                                                section.partOrder ===
-                                                currentPart.partOrder
-                                                    ? styles["active"]
-                                                    : ""
+                                            className={`${styles["section-container"]} ${
+                                                section.partOrder === currentPart.partOrder ? styles["active"] : ""
                                             }`}
                                         >
-                                            <div>
-                                                Section:{" "}
-                                                {section.sectionOrder ||
-                                                    "NULL SECTION ORDER"}
-                                            </div>
-                                            <div>
-                                                {section.title ||
-                                                    "NULL SECTION TITLE"}
-                                            </div>
-                                            <div>
-                                                {section.sectionGuide ||
-                                                    "NULL SECTION GUIDE"}
-                                            </div>
+                                            <div>Section: {section.sectionOrder || "NULL SECTION ORDER"}</div>
+                                            <div>{section.title || "NULL SECTION TITLE"}</div>
+                                            <div>{section.sectionGuide || "NULL SECTION GUIDE"}</div>
+                                            {section.sectionType === "table" &&
+                                                tables.find((table) => table.id === section.id).htmlCode}
+
                                             {questions &&
                                                 questions.length > 0 &&
                                                 questions
                                                     .filter(
                                                         (question) =>
-                                                            question.sectionOrder ===
-                                                                section.sectionOrder &&
-                                                            question.partOrder ===
-                                                                section.partOrder
+                                                            question.sectionOrder === section.sectionOrder &&
+                                                            question.partOrder === section.partOrder
                                                     )
                                                     .map((question) => (
                                                         <>
                                                             <TestQuestion
                                                                 onClick={() => {
-                                                                    setQuestionMark(
-                                                                        (
-                                                                            state
-                                                                        ) => {
-                                                                            const newState =
-                                                                                {
-                                                                                    ...state,
-                                                                                };
-                                                                            newState[
-                                                                                question.id
-                                                                            ] =
-                                                                                !newState[
-                                                                                    question
-                                                                                        .id
-                                                                                ];
-                                                                            return newState;
-                                                                        }
-                                                                    );
+                                                                    setQuestionMark((state) => {
+                                                                        const newState = {
+                                                                            ...state,
+                                                                        };
+                                                                        newState[question.id] = {
+                                                                            ...newState[question.id],
+                                                                            isMarked: !newState[question.id].isMarked,
+                                                                        };
+                                                                        return newState;
+                                                                    });
                                                                 }}
                                                                 className={
-                                                                    questionMark[
-                                                                        question
-                                                                            .id
-                                                                    ]
+                                                                    questionMark[question.id].isMarked
                                                                         ? "book-mark"
                                                                         : ""
                                                                 }
-                                                                question={
-                                                                    question
-                                                                }
+                                                                question={question}
+                                                                value={questionMark[question.id].input}
                                                                 id={`question-${question.id}`}
+                                                                onInputChange={handleInputChange}
                                                             ></TestQuestion>
                                                         </>
                                                     ))}
@@ -345,86 +302,42 @@ const TestPractice = () => {
                             parts.length > 0 &&
                             parts.map((part) => (
                                 <>
-                                    <div>
-                                        Part{" "}
-                                        {part.partOrder || "NULL PART ORDER"}
-                                    </div>
-                                    <div
-                                        className={
-                                            styles["question-nav-container"]
-                                        }
-                                    >
+                                    <div>Part {part.partOrder || "NULL PART ORDER"}</div>
+                                    <div className={styles["question-nav-container"]}>
                                         {questions
-                                            .filter(
-                                                (question) =>
-                                                    question.partOrder ===
-                                                    part.partOrder
-                                            )
+                                            .filter((question) => question.partOrder === part.partOrder)
                                             .map((question) => (
                                                 <div
-                                                    className={`${
-                                                        styles[
-                                                            "question-nav-button"
-                                                        ]
-                                                    } ${
-                                                        questionMark[
-                                                            question.id
-                                                        ]
-                                                            ? styles[
-                                                                  "book-mark"
-                                                              ]
-                                                            : ""
-                                                    }`}
+                                                    className={`${styles["question-nav-button"]} ${
+                                                        questionMark[question.id]?.isMarked ? styles["book-mark"] : ""
+                                                    } ${questionMark[question.id]?.input ? styles["done"] : ""}`}
                                                     data-question-id={`question-${question.id}`}
-                                                    data-part-order={
-                                                        part.partOrder
-                                                    }
+                                                    data-part-order={part.partOrder}
                                                     onClick={(e) => {
                                                         if (
-                                                            Number(
-                                                                e.target.dataset
-                                                                    .partOrder
-                                                            ) ===
-                                                            currentPart.partOrder
+                                                            Number(e.target.dataset.partOrder) === currentPart.partOrder
                                                         ) {
                                                         } else {
                                                             setCurrentPart(
                                                                 parts.find(
                                                                     (part) =>
                                                                         part.partOrder ===
-                                                                        Number(
-                                                                            e
-                                                                                .target
-                                                                                .dataset
-                                                                                .partOrder
-                                                                        )
+                                                                        Number(e.target.dataset.partOrder)
                                                                 )
                                                             );
-                                                            // console.log(
-                                                            //     "Not same"
-                                                            // );
                                                         }
-                                                        // console.log(
-                                                        //     e.target.dataset
-                                                        // );
-                                                        const question =
-                                                            document.querySelector(
-                                                                `#${e.target.dataset.questionId}`
-                                                            );
+                                                        const question = document.querySelector(
+                                                            `#${e.target.dataset.questionId}`
+                                                        );
                                                         setTimeout(() => {
-                                                            question.scrollIntoView(
-                                                                {
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                    behavior:
-                                                                        "smooth",
-                                                                }
-                                                            );
-                                                            question.style.outline =
-                                                                "2px solid yellow";
+                                                            question.scrollIntoView({
+                                                                block: "center",
+                                                                inline: "nearest",
+                                                                behavior: "smooth",
+                                                            });
+                                                            question.style.outline = "2px solid yellow";
                                                             setTimeout(() => {
-                                                                question.style.outline =
-                                                                    "none";
+                                                                question.style.outline = "none";
                                                             }, 1000);
                                                         }, 25);
                                                     }}
@@ -436,10 +349,7 @@ const TestPractice = () => {
                                 </>
                             ))}
                     </div>
-                    <button
-                        className={styles["submit-button"]}
-                        onClick={() => sendResult()}
-                    >
+                    <button className={styles["submit-button"]} onClick={() => sendResult()}>
                         Submit
                     </button>
                 </div>

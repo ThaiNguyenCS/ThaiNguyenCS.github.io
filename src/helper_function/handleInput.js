@@ -1,3 +1,5 @@
+import { monthNames } from "../helper_function/timeHandling";
+
 function handleInput(str) {
     let input = str;
     input = input.toLowerCase();
@@ -91,4 +93,43 @@ function convertSecondsToTime (second)
     }
 }
 
-export { handleInput, checkValidRegisterPassword, checkValidRegisterUserName, checkTheSecondPassword, convertPixelSizeToNumber, convertSecondsToTime };
+const getPartOrderJSONArr = (parts) => {
+    if (parts) {
+        const arr = [];
+        parts.forEach((part) => arr.push(part.partOrder));
+        return JSON.stringify(arr);
+    }
+    return "";
+};
+
+const generateSQLTimestamp = (timeStr) => {
+    if (timeStr) {
+        return timeStr
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+    }
+    return "";
+};
+
+const getDurationStrFromSecond =  (second) => {
+    const minute = Math.trunc(second / 60);
+    const hour = Math.trunc(minute / 60);
+    const sec = second % 60;
+    return `${hour.toString().padStart(1, '0')}:${minute.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
+}
+
+const getFormatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date.getHours().toString().padStart(2, 0)}:${date.getMinutes().toString().padStart(2, 0)}:${date.getSeconds().toString().padStart(2, 0)}`;
+}
+
+const getPartStr = (partJSON) => 
+{
+    let partArr = JSON.parse(partJSON);
+    return partArr.join(", ");
+}
+
+export { handleInput, checkValidRegisterPassword, checkValidRegisterUserName, checkTheSecondPassword, convertPixelSizeToNumber, convertSecondsToTime, generateSQLTimestamp
+    , getPartOrderJSONArr, getPartStr, getFormatDate, getDurationStrFromSecond
+ };

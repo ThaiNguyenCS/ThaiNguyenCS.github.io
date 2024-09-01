@@ -95,9 +95,16 @@
     background-color: rgb(197, 197, 197);
 }
 
+.question-nav-button.done
+{
+    background-color: rgb(69, 141, 249);
+    color: white;
+}
+
 .question-nav-button.book-mark
 {
     background-color: yellow;
+    color: black;
 }
 
 .submit-button{

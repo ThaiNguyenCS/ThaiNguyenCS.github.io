@@ -25,6 +25,7 @@ import {ErrorComponent} from "./components/ErrorComponent.jsx";
 import { Tests, loader as testLoader } from "./components/Tests.jsx";
 import { TestDetail, loader as testDetailLoader, action as testDetailAction } from "./components/TestDetail.jsx";
 import { TestPractice, loader as testPracticeLoader, action as testPracticeAction } from "./components/TestPractice.jsx";
+import { TestResult, loader as testResultLoader } from "./components/TestResult.jsx";
 
 const router = createBrowserRouter([
     {
@@ -56,6 +57,11 @@ const router = createBrowserRouter([
                 element: <TestPractice/>,
                 loader: testPracticeLoader,
                 action: testPracticeAction,
+            },
+            {
+                path: "tests/:id/result/:historyID",
+                element: <TestResult/>,
+                loader: testResultLoader,
             },
             {
                 path: "tests/:id",
