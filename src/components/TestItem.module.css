@@ -4,9 +4,20 @@
     display: flex;
     flex-direction: column;
     border: 1px solid rgb(212, 212, 212);
+    box-shadow: 0 3px rgb(212, 212, 212);
     padding: 12px 10px;
-    height: 200px;
+    border-radius: 4px;
+    height: 230px;
+    transition: 80ms;
 }
+
+
+.item-container:hover
+{
+    transform: translateY(3px);
+    box-shadow: 0 0;
+}
+
 
 .item-title {
     -webkit-line-clamp: 2;
@@ -27,4 +38,7 @@
 .start-button
 {
     margin-top: auto;
+    height: 30px;
+    align-self: center;
+    width: 80%;
 }

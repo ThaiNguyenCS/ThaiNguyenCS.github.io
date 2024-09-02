@@ -1,28 +1,52 @@
-.calendar-header
-{
+.calendar-header {
     display: grid;
     grid-template-columns: 50px 1fr 50px;
     justify-items: center;
     align-items: center;
+    user-select: none;
+    margin-bottom: 16px;
 }
 
-.month
-{
+.month {
     font-weight: 600;
     font-size: 1.2rem;
     justify-self: center;
 }
 
-.calendar-body
-{
+.calendar-body {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     column-gap: 5px;
     row-gap: 5px;
 }
 
-.day-cell
-{
-    background-color: antiquewhite;
+.calendar-control-button {
+    width: 1.4rem;
+    height: 1.4rem;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 999px;
+}
+
+.calendar-control-button:hover {
+    background-color: rgb(219, 219, 219);
+}
+
+.calendar-control-button:active {
+    background-color: rgb(204, 204, 204);
+}
+
+.day-cell {
     height: 30px;
+    justify-self: center;
+}
+
+.day-cell.day-header {
+    font-weight: bold;
+}
+
+.checked-icon {
+    width: 1.2rem;
+    height: 1.2rem;
 }
