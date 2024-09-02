@@ -8,7 +8,7 @@ import { getFormatDate } from "../helper_function/handleInput";
 const loader = async ({ params }) => {
     const token = localStorage.getItem("jwt_token");
 
-    const testResponse = await axios.get(`${apiURL}/tests/foo/${params.id}`);
+    const testResponse = await axios.get(`${apiURL}/tests/${params.topic}/${params.id}`);
     const testHistories = await axios.get(
         `${apiURL}/test/practice/${params.id}/history`,
         {

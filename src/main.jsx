@@ -64,10 +64,15 @@ const router = createBrowserRouter([
                 loader: testResultLoader,
             },
             {
-                path: "tests/:id",
+                path: "tests/:topic/:id",
                 element: <TestDetail/>,
                 loader: testDetailLoader,
                 action: testDetailAction,
+            },
+            {
+                path: "tests/:topic",
+                element: <Tests/>,
+                loader: testLoader,
             },
             {
                 path: "tests",

@@ -214,7 +214,6 @@ const TestPractice = () => {
                                             part === currentPart ? styles["active"] : ""
                                         }`}
                                     >
-                                        <div>Part: {part.partOrder || "NULL PART ORDER"}</div>
                                         <div>{part.title || "NULL PART TITLE"}</div>
                                         <div>{part.partGuide || "NULL PART GUIDE"}</div>
                                         <div>{part.partContent || "NULL PART CONTENT"}</div>

@@ -120,8 +120,12 @@ const getDurationStrFromSecond =  (second) => {
 }
 
 const getFormatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date.getHours().toString().padStart(2, 0)}:${date.getMinutes().toString().padStart(2, 0)}:${date.getSeconds().toString().padStart(2, 0)}`;
+    if(dateStr)
+    {
+        const date = new Date(dateStr);
+        return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date.getHours().toString().padStart(2, 0)}:${date.getMinutes().toString().padStart(2, 0)}:${date.getSeconds().toString().padStart(2, 0)}`;
+    }
+    return "null date";
 }
 
 const getPartStr = (partJSON) => 

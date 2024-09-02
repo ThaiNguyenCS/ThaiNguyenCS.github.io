@@ -49,12 +49,9 @@ const Header = () => {
     };
 
     const goToTests = () => {
-        navigate("/tests");
+        navigate("/tests/all");
     };
 
-    const logOut = () => {
-        dispatch(setLoginState(false));
-    };
 
     const toggleSettingMenu = (e) => {
         e.preventDefault();

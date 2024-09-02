@@ -10,4 +10,15 @@
     border-radius: 999px;
     font-size: 1rem;
     border: 1px solid gray;
+    cursor: pointer;
+}
+
+.button:hover
+{
+    background-color: rgb(238, 238, 238);
+}
+
+.button:active
+{
+    background-color: rgb(173, 173, 173);
 }
