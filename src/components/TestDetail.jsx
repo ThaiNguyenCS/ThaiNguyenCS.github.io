@@ -9,14 +9,11 @@ const loader = async ({ params }) => {
     const token = localStorage.getItem("jwt_token");
 
     const testResponse = await axios.get(`${apiURL}/tests/${params.topic}/${params.id}`);
-    const testHistories = await axios.get(
-        `${apiURL}/test/practice/${params.id}/history`,
-        {
-            headers: {
-                Authorization: `Bearer ${token || "no_token"}`,
-            },
-        }
-    );
+    const testHistories = await axios.get(`${apiURL}/test/practice/${params.id}/history`, {
+        headers: {
+            Authorization: `Bearer ${token || "no_token"}`,
+        },
+    });
     const test = testResponse.data;
     const histories = testHistories.data;
     const obj = {};
@@ -52,92 +49,97 @@ const TestDetail = () => {
     const [canSubmit, setCanSubmit] = useState(false);
 
     useEffect(() => {
-        if(test && test.length > 0)
-        {
+        if (test && test.length > 0) {
             setCheckBoxStatus(new Array(test.length).fill(false));
         }
-    }, [test])
+    }, [test]);
 
     useEffect(() => {
-        if(checkBoxStatus.length > 0)
-        {
+        if (checkBoxStatus.length > 0) {
             console.log(checkBoxStatus);
-            const isValid = checkBoxStatus.some(box => box);
+            const isValid = checkBoxStatus.some((box) => box);
             setCanSubmit(isValid);
         }
-    }, [checkBoxStatus])
-    
-    const getDurationStrFromSecond =  (second) => {
+    }, [checkBoxStatus]);
+
+    const getDurationStrFromSecond = (second) => {
         const minute = Math.trunc(second / 60);
         const hour = Math.trunc(minute / 60);
         const sec = second % 60;
-        return `${hour.toString().padStart(1, '0')}:${minute.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
-    }
+        return `${hour.toString().padStart(1, "0")}:${minute.toString().padStart(2, "0")}:${sec
+            .toString()
+            .padStart(2, "0")}`;
+    };
 
-    const getPartStr = (partJSON) => 
-    {
+    const getPartStr = (partJSON) => {
         let partArr = JSON.parse(partJSON);
         return partArr.join(", ");
-    }
+    };
 
     const updateCheckboxStatus = (idx) => {
         console.log("update " + idx);
         let newStatus = [...checkBoxStatus];
         newStatus[idx] = !newStatus[idx];
         setCheckBoxStatus(newStatus);
-    }
-
-
+    };
 
     return (
         <>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Parts</th>
-                        <th>Duration</th>
-                        <th>Result</th>
-                        <th>Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {testHistories &&
-                        testHistories.length > 0 &&
-                        testHistories.map((history) => (
+            <div className={styles["container"]}>
+                <div className={styles["test-title"]}>{test[0].testTitle || "NULL TITLE"}</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Parts</th>
+                            <th>Duration</th>
+                            <th>Result</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {testHistories &&
+                            testHistories.length > 0 &&
+                            testHistories.map((history) => (
+                                <>
+                                    <tr>
+                                        <td>{getFormatDate(history.startingTime)}</td>
+                                        <td>{getPartStr(history.partArr)}</td>
+                                        <td>{getDurationStrFromSecond(history.duration)}</td>
+                                        <td>
+                                            {history.noOfCorrectQuestions}/{history.totalQuestions}
+                                        </td>
+                                        <td>
+                                            <Link to={`/tests/${history.testID}/result/${history.id}`}>Review</Link>
+                                        </td>
+                                    </tr>
+                                </>
+                            ))}
+                    </tbody>
+                </table>
+
+                <Form method="POST">
+                    <input type="hidden" name="__action" value={"selectPart"} />
+                    {test &&
+                        test.map((item, idx) => (
                             <>
-                                <tr>
-                                    <td>{getFormatDate(history.startingTime)}</td>
-                                    <td>{getPartStr(history.partArr)}</td>
-                                    <td>{getDurationStrFromSecond(history.duration)}</td>
-                                    <td>
-                                        {history.noOfCorrectQuestions}/
-                                        {history.totalQuestions}
-                                    </td>
-                                    <td><Link to={`/tests/${history.testID}/result/${history.id}`}>Review</Link></td>
-                                </tr>
+                                <label>Part {item.partOrder}</label>
+                                <input
+                                    type="checkbox"
+                                    name="part"
+                                    value={item.partOrder}
+                                    checked={checkBoxStatus[idx]}
+                                    onChange={() => {
+                                        updateCheckboxStatus(idx);
+                                    }}
+                                />
                             </>
                         ))}
-                </tbody>
-            </table>
-         
-            <Form method="POST">
-                <input type="hidden" name="__action" value={"selectPart"} />
-                {test &&
-                    test.map((item, idx) => (
-                        <>
-                            <label>Part {item.partOrder}</label>
-                            <input
-                                type="checkbox"
-                                name="part"
-                                value={item.partOrder}
-                                checked={checkBoxStatus[idx]}
-                                onChange={() => {updateCheckboxStatus(idx);}}
-                            />
-                        </>
-                    ))}
-                <button type="submit" disabled={!canSubmit}>Do it!</button>
-            </Form>
+                    <button type="submit" disabled={!canSubmit}>
+                        Do it!
+                    </button>
+                </Form>
+            </div>
         </>
     );
 };

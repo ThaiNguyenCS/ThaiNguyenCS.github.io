@@ -39,7 +39,7 @@ const action = async ({ request, params }) => {
     });
     if (submitResponse.data.result) {
         // database storage result
-        return redirect(`/test/${params.id}/result/${historyID}`);
+        return redirect(`/tests/${params.id}/result/${historyID}`);
     } else {
         alert("There's something wrong. Your test will not be saved!");
     }

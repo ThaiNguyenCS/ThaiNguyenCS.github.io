@@ -13,7 +13,7 @@ const TestItem = (props) => {
     console.log(props.test)
     return (
         <>
-            <div className={styles["item-container"]}>
+            <div className={`${styles["item-container"]} ${props.test.startingTime ? styles["finished-test"] : ''}`}>
                 <div className={styles["item-title"]}>
                 {props.test.title || "NULL"}
                 </div>

@@ -13,7 +13,6 @@
 #side-menu-button,
 #setting-button {
     flex-basis: 70px;
-    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,6 +31,7 @@
     z-index: 10;
     width: 35px;
     border: none;
+    cursor: pointer;
     border-radius: 999px;
     transition: 150ms;
 }
@@ -56,8 +56,10 @@
     cursor: pointer;
 }
 
-#dictation-navigation {
+#dictation-navigation, 
+#test-navigation,
+#flashcard-navigation{
     cursor: pointer;
-    padding: 0 5px;
+    margin: 0 5px;
 }
 

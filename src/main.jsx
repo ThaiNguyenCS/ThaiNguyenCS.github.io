@@ -26,6 +26,9 @@ import { Tests, loader as testLoader } from "./components/Tests.jsx";
 import { TestDetail, loader as testDetailLoader, action as testDetailAction } from "./components/TestDetail.jsx";
 import { TestPractice, loader as testPracticeLoader, action as testPracticeAction } from "./components/TestPractice.jsx";
 import { TestResult, loader as testResultLoader } from "./components/TestResult.jsx";
+import { Flashcard } from "./components/Flashcard.jsx";
+import { FlashcardItem } from "./components/FlashcardItem.jsx";
+import { FlashcardDetail } from "./components/FlashcardDetail.jsx";
 
 const router = createBrowserRouter([
     {
@@ -78,6 +81,14 @@ const router = createBrowserRouter([
                 path: "tests",
                 element: <Tests/>,
                 loader: testLoader,
+            },
+            {
+                path: "flashcard/:id",
+                element: <FlashcardDetail/>,
+            },
+            {
+                path: "flashcard",
+                element: <Flashcard/>,
             },
         ],
     },

@@ -52,6 +52,10 @@ const Header = () => {
         navigate("/tests/all");
     };
 
+    const goToFlashCard = () => {
+        navigate("/flashcard");
+    };
+
 
     const toggleSettingMenu = (e) => {
         e.preventDefault();
@@ -79,8 +83,12 @@ const Header = () => {
                     Dictation
                 </div>
 
-                <div id="dictation-navigation" onClick={() => goToTests()}>
+                <div id="test-navigation" onClick={() => goToTests()}>
                     Tests
+                </div>
+
+                <div id="flashcard-navigation" onClick={() => goToFlashCard()}>
+                    Flashcard
                 </div>
 
                 <div id="setting-button">

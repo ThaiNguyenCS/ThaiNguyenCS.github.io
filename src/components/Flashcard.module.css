@@ -1,0 +1,23 @@
+.container
+{
+    width: 80%;
+    margin: 30px 10%;
+    height: 100px;
+}
+
+.title 
+{
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 50px;
+    display: grid;
+    place-items: center;
+}
+
+.flashcard-collection-container
+{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 50px;
+    row-gap: 20px;
+}

@@ -18,6 +18,12 @@
     box-shadow: 0 0;
 }
 
+.item-container.finished-test {
+    border: 1px solid rgb(0, 222, 55);
+    box-shadow: 0 3px rgb(0, 222, 55);
+}
+
+
 
 .item-title {
     -webkit-line-clamp: 2;

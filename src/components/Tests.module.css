@@ -5,6 +5,7 @@
 
 .title {
     font-size: 2rem;
+    font-weight: 500;
 }
 
 .left-section {
@@ -33,6 +34,7 @@
     color: rgb(237, 244, 255);
     font-weight: 600;
     font-size: 1rem;
+    cursor: pointer;
     border: none;
     border-radius: 999px;
     background-color: rgb(30, 115, 235);
