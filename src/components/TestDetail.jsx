@@ -5,7 +5,8 @@ import styles from "./TestDetail.module.css";
 import { Form, Link, redirect, useLoaderData } from "react-router-dom";
 import { getFormatDate } from "../helper_function/handleInput";
 
-const loader = async ({ params }) => {
+const loader = async ({ request, params }) => {
+ 
     const token = localStorage.getItem("jwt_token");
 
     const testResponse = await axios.get(`${apiURL}/tests/${params.topic}/${params.id}`);

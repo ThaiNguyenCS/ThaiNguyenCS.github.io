@@ -3,38 +3,37 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import {
-    Dictation,
-    loader as dictationLoader,
-} from "./components/Dictation.jsx";
-import {
-    DictationTopics,
-    loader as topicLoader,
-} from "./components/DictationTopics.jsx";
+import { Dictation, loader as dictationLoader } from "./components/Dictation.jsx";
+import { DictationTopics, loader as topicLoader } from "./components/DictationTopics.jsx";
 import store from "./store.js";
 import { Provider } from "react-redux";
-import {
-    Exercises,
-    loader as exerciseLoader,
-} from "./components/Exercises.jsx";
+import { Exercises, loader as exerciseLoader } from "./components/Exercises.jsx";
 import { MainPage } from "./components/MainPage.jsx";
 import { action as loginAction, Login } from "./components/Login.jsx";
 import { SignUp, action as registerAction } from "./components/SignUp.jsx";
 import { AuthenticCheck } from "./components/AuthenticCheck.jsx";
-import {ErrorComponent} from "./components/ErrorComponent.jsx";
+import { ErrorComponent } from "./components/ErrorComponent.jsx";
 import { Tests, loader as testLoader } from "./components/Tests.jsx";
 import { TestDetail, loader as testDetailLoader, action as testDetailAction } from "./components/TestDetail.jsx";
-import { TestPractice, loader as testPracticeLoader, action as testPracticeAction } from "./components/TestPractice.jsx";
+import {
+    TestPractice,
+    loader as testPracticeLoader,
+    action as testPracticeAction,
+} from "./components/TestPractice.jsx";
 import { TestResult, loader as testResultLoader } from "./components/TestResult.jsx";
-import { Flashcard } from "./components/Flashcard.jsx";
+import { Flashcard, loader as flashcardLoader, action as flashcardAction } from "./components/Flashcard.jsx";
 import { FlashcardItem } from "./components/FlashcardItem.jsx";
-import { FlashcardDetail } from "./components/FlashcardDetail.jsx";
+import {
+    action as flashcardDetailAction,
+    FlashcardDetail,
+    loader as flashcardDetailLoader,
+} from "./components/FlashcardDetail.jsx";
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <MainPage />,
-        errorElement: <ErrorComponent/>,
+        errorElement: <ErrorComponent />,
         children: [
             {
                 path: "home",
@@ -57,38 +56,42 @@ const router = createBrowserRouter([
             },
             {
                 path: "tests/practice/:id",
-                element: <TestPractice/>,
+                element: <TestPractice />,
                 loader: testPracticeLoader,
                 action: testPracticeAction,
             },
             {
                 path: "tests/:id/result/:historyID",
-                element: <TestResult/>,
+                element: <TestResult />,
                 loader: testResultLoader,
             },
             {
                 path: "tests/:topic/:id",
-                element: <TestDetail/>,
+                element: <TestDetail />,
                 loader: testDetailLoader,
                 action: testDetailAction,
             },
             {
                 path: "tests/:topic",
-                element: <Tests/>,
+                element: <Tests />,
                 loader: testLoader,
             },
             {
                 path: "tests",
-                element: <Tests/>,
+                element: <Tests />,
                 loader: testLoader,
             },
             {
                 path: "flashcard/:id",
-                element: <FlashcardDetail/>,
+                element: <FlashcardDetail />,
+                action: flashcardDetailAction,
+                loader: flashcardDetailLoader,
             },
             {
                 path: "flashcard",
-                element: <Flashcard/>,
+                element: <Flashcard />,
+                loader: flashcardLoader,
+                action: flashcardAction,
             },
         ],
     },
@@ -96,9 +99,8 @@ const router = createBrowserRouter([
         path: "/login",
         element: (
             <>
-                <AuthenticCheck/>
+                <AuthenticCheck />
                 <Login />
-
             </>
         ),
         action: loginAction,

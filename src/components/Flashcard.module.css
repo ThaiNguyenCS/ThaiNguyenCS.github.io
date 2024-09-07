@@ -2,7 +2,30 @@
 {
     width: 80%;
     margin: 30px 10%;
-    height: 100px;
+    display: flex;
+    flex-direction: column;
+}
+
+.option-container
+{
+    display: flex;
+    align-self: flex-end;
+    margin-bottom: 10px;
+}
+
+.option-button
+{
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5px;
+}
+
+.button-icon
+{
+    width: 30px;
+    height: 30px;
 }
 
 .title 
@@ -21,3 +44,6 @@
     column-gap: 50px;
     row-gap: 20px;
 }
+
+
+
