@@ -90,11 +90,22 @@ const FlashcardDetail = (props) => {
                 },
             });
             const data = result.data;
-            if (data.result) return data.data;
+            if (data.result) {
+                const words = data.data;
+                const newAllWords = [...allWords];
+                for (const entry of Object.entries(words)) {
+                    console.log(entry);
+                    if (entry[1].result) {
+                        for (let i = 0; i < entry[1].result.length; i++) {
+                            newAllWords[entry[1].start + i] = entry[1].result[i];
+                        }
+                    }
+                    setAllWords(newAllWords);
+                }
+            }
         } else {
             setDisplayWords();
             console.log("Data's available already");
-            return null;
         }
     };
 
@@ -106,31 +117,20 @@ const FlashcardDetail = (props) => {
 
     useEffect(() => {
         if (collection) {
-            setCurrentPage(1); // return to the first page
+            if (currentPage === 1) {
+                // if currentPage is already 1, try request here
+                requestWords();
+            } else {
+                // if currentPage is not 1
+                setCurrentPage(1); // return to the first page
+            }
             setMaxPage(Math.floor(collection.noOfWords / limit) + 1); // re-evaluate the max page based on current limit
         }
     }, [limit]);
 
     useEffect(() => {
-        // navigate(`/flashcard/${collection.id}/?page=${currentPage}&limit=${limit}`);\
         if (collection) {
-            const getRequestWords = async () => {
-                const words = await requestWords();
-                if (words) {
-                    console.log(words);
-                    const newAllWords = [...allWords];
-                    for (const entry of Object.entries(words)) {
-                        console.log(entry);
-                        if (entry[1].result) {
-                            for (let i = 0; i < entry[1].result.length; i++) {
-                                newAllWords[entry[1].start + i] = entry[1].result[i];
-                            }
-                        }
-                        setAllWords(newAllWords);
-                    }
-                }
-            };
-            getRequestWords();
+            requestWords();
         }
     }, [currentPage]);
 
