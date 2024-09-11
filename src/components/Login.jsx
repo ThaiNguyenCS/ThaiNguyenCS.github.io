@@ -38,7 +38,7 @@ const Login = () => {
                 } else {
                     console.log("login successfully");
                     dispatch(setLoginState(true));
-                    navigate("/home", {replace: true}); // back to the previous page
+                    navigate("/home", {replace: true}); // back to the home page and clear login page
                 }
             }
         }

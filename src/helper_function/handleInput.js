@@ -21,7 +21,7 @@ function handleInput(str) {
 
 function checkValidRegisterUserName(username) {
     let formatName = username.trim();
-    if (formatName.length < 3) return {result: false, msg: 'Username must be at least 3 characters length'};
+    if (formatName.length < 3) return { result: false, msg: "Username must be at least 3 characters length" };
     for (let i = 0; i < formatName.length; i++) {
         const chr = formatName.charAt(i);
         if (
@@ -33,9 +33,12 @@ function checkValidRegisterUserName(username) {
                 (chr >= "0" && chr <= "9")
             )
         )
-            return {result: false, msg: "Username can only contain lowercase, uppercase, number, space and underscore"};
+            return {
+                result: false,
+                msg: "Username can only contain lowercase, uppercase, number, space and underscore",
+            };
     }
-    return {result: true, msg: "Valid username"};
+    return { result: true, msg: "Valid username" };
 }
 // password: at least 1 uppercase, 1 lowercase, 1 number, length is more than 8
 function checkValidRegisterPassword(password) {
@@ -61,35 +64,27 @@ function checkValidRegisterPassword(password) {
     return { result: false, msg: "Password does not meet all the demands" };
 }
 
-function checkTheSecondPassword(password1, password2)
-{
-    if(password1 !== password2)
-        return {result: false, msg: "Password does not match!"}
-    return {result: true, msg: "Password matched!"}
+function checkTheSecondPassword(password1, password2) {
+    if (password1 !== password2) return { result: false, msg: "Password does not match!" };
+    return { result: true, msg: "Password matched!" };
 }
 
-function convertPixelSizeToNumber (str)
-{
-    if(str.length < 3)
-    {
+function convertPixelSizeToNumber(str) {
+    if (str.length < 3) {
         console.log("Invalid str");
         return 0;
     }
-    let formattedStr = str.substring(0, str.length-2);
+    let formattedStr = str.substring(0, str.length - 2);
     return Number(formattedStr);
 }
 
-function convertSecondsToTime (second)
-{
-    if(second < 60)
-    {
-        return `00:${second.toString().padStart(2, '0')}`
-    }
-    else
-    {
+function convertSecondsToTime(second) {
+    if (second < 60) {
+        return `00:${second.toString().padStart(2, "0")}`;
+    } else {
         const minutes = Math.trunc(second / 60);
         const leftSecond = second % 60;
-        return `${minutes.toString().padStart(2, '0')}:${leftSecond.toString().padStart(2, '0')}`
+        return `${minutes.toString().padStart(2, "0")}:${leftSecond.toString().padStart(2, "0")}`;
     }
 }
 
@@ -104,36 +99,60 @@ const getPartOrderJSONArr = (parts) => {
 
 const generateSQLTimestamp = (timeStr) => {
     if (timeStr) {
-        return timeStr
-            .toISOString()
-            .slice(0, 19)
-            .replace("T", " ");
+        return timeStr.toISOString().slice(0, 19).replace("T", " ");
     }
     return "";
 };
 
-const getDurationStrFromSecond =  (second) => {
+const getDurationStrFromSecond = (second) => {
     const minute = Math.trunc(second / 60);
     const hour = Math.trunc(minute / 60);
     const sec = second % 60;
-    return `${hour.toString().padStart(1, '0')}:${minute.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
-}
+    return `${hour.toString().padStart(1, "0")}:${minute.toString().padStart(2, "0")}:${sec
+        .toString()
+        .padStart(2, "0")}`;
+};
 
 const getFormatDate = (dateStr) => {
-    if(dateStr)
-    {
+    if (dateStr) {
         const date = new Date(dateStr);
-        return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date.getHours().toString().padStart(2, 0)}:${date.getMinutes().toString().padStart(2, 0)}:${date.getSeconds().toString().padStart(2, 0)}`;
+        return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date
+            .getHours()
+            .toString()
+            .padStart(2, 0)}:${date.getMinutes().toString().padStart(2, 0)}:${date
+            .getSeconds()
+            .toString()
+            .padStart(2, 0)}`;
     }
     return "null date";
-}
+};
 
-const getPartStr = (partJSON) => 
-{
+const getMaxPage = (noOfWords, limit) => {
+    const floorNum = Math.floor(noOfWords / limit);
+    if (noOfWords / limit > floorNum) {
+        console.log("max page " + (floorNum + 1));
+        return floorNum + 1;
+    }
+    console.log("max page " + floorNum);
+    return floorNum;
+};
+
+const getPartStr = (partJSON) => {
     let partArr = JSON.parse(partJSON);
     return partArr.join(", ");
-}
+};
 
-export { handleInput, checkValidRegisterPassword, checkValidRegisterUserName, checkTheSecondPassword, convertPixelSizeToNumber, convertSecondsToTime, generateSQLTimestamp
-    , getPartOrderJSONArr, getPartStr, getFormatDate, getDurationStrFromSecond
- };
+export {
+    handleInput,
+    checkValidRegisterPassword,
+    checkValidRegisterUserName,
+    checkTheSecondPassword,
+    convertPixelSizeToNumber,
+    convertSecondsToTime,
+    generateSQLTimestamp,
+    getPartOrderJSONArr,
+    getPartStr,
+    getFormatDate,
+    getDurationStrFromSecond,
+    getMaxPage,
+};

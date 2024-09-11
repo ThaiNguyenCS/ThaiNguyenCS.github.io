@@ -8,6 +8,7 @@
     z-index: 1000;
     top: 0;
     right: 0;
+    border-bottom: 1px solid rgba(226, 226, 226, 0.625);
 }
 
 #side-menu-button,
@@ -60,6 +61,24 @@
 #test-navigation,
 #flashcard-navigation{
     cursor: pointer;
+    font-weight: 400;
     margin: 0 5px;
+    color: rgb(208, 208, 208);
 }
 
+
+#dictation-navigation:hover, 
+#test-navigation:hover,
+#flashcard-navigation:hover{
+    cursor: pointer;
+    margin: 0 5px;
+    color: rgb(35, 35, 255);
+}
+
+#dictation-navigation.nav-active, 
+#test-navigation.nav-active,
+#flashcard-navigation.nav-active
+{
+    font-weight: 500;
+    color: rgb(0, 0, 188);
+}

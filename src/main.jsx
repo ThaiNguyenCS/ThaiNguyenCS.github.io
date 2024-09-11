@@ -7,7 +7,6 @@ import { Dictation, loader as dictationLoader } from "./components/Dictation.jsx
 import { DictationTopics, loader as topicLoader } from "./components/DictationTopics.jsx";
 import store from "./store.js";
 import { Provider } from "react-redux";
-import { Exercises, loader as exerciseLoader } from "./components/Exercises.jsx";
 import { MainPage } from "./components/MainPage.jsx";
 import { action as loginAction, Login } from "./components/Login.jsx";
 import { SignUp, action as registerAction } from "./components/SignUp.jsx";
@@ -28,6 +27,8 @@ import {
     FlashcardDetail,
     loader as flashcardDetailLoader,
 } from "./components/FlashcardDetail.jsx";
+import { FlashcardPractice, loader as flashcardPracticeLoader } from "./components/FlashcardPractice.jsx";
+import { DictationExercises, loader as exerciseLoader } from "./components/DictationExercises.jsx";
 
 const router = createBrowserRouter([
     {
@@ -46,7 +47,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "dictation/:topic",
-                element: <Exercises />,
+                element: <DictationExercises />,
                 loader: exerciseLoader,
             },
             {
@@ -80,6 +81,11 @@ const router = createBrowserRouter([
                 path: "tests",
                 element: <Tests />,
                 loader: testLoader,
+            },
+            {
+                path: "flashcard/:id/practice",
+                element: <FlashcardPractice />,
+                loader: flashcardPracticeLoader,
             },
             {
                 path: "flashcard/:id",

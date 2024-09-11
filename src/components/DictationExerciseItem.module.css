@@ -3,20 +3,36 @@
     display: flex;
     background-color: white;
     border: 1px solid black;
+    border-radius: 3px;
     margin-bottom: 5px;
     padding: 5px 10px;
     align-items: start;
     flex-direction: column;
 }
 
-.item-title
-{
+.item-title {
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
 }
 
-.item-title:hover
-{
+.item-title:hover {
     text-decoration: underline;
+}
+
+.item-progress-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.item-progress-text.undone {
+    color: gray;
+}
+
+.item-progress-text.done {
+    color: rgb(20, 192, 17);
+}
+
+.item-progress-text.ongoing {
+    color: #ff5500;
 }

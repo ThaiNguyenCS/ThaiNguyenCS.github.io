@@ -1,7 +1,7 @@
 import React from "react";
 import youtubePoster from "../assets/youtube_topic.webp";
 import { useNavigate } from "react-router-dom";
-import "./TopicItem.css"
+import styles from "./TopicItem.module.css"
 
 const TopicItem = (props) => {
     const navigate= useNavigate();
@@ -10,22 +10,21 @@ const TopicItem = (props) => {
         navigate(`/dictation/${url}`);
     };
 
-
     return (
         <>
             <div
-                className="topic-holder"
+                className={styles['topic-holder']}
                 onClick={() => handleNavigation(props.url)}
             >
-                <div className="topic-img-holder">
+                <div className={styles['topic-img-holder']}>
                     <img
-                        src={youtubePoster}
+                        src={youtubePoster}F
                         alt="Youtube"
-                        className="topic-img"
+                        className={styles["topic-img"]}
                     />
                 </div>
-                <div className="topic-title">{props.topicName}</div>
-                <div className="topic-exercise-count">Exercises: {props.noOfExercises}</div>
+                <div className={styles["topic-title"]}>{props.topicName}</div>
+                <div className={styles["topic-exercise-count"]}>Exercises: {props.noOfExercises}</div>
             </div>
         </>
     );

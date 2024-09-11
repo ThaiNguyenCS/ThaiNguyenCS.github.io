@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {isLogined: false};
+const initialState = {isLogined: false, activePath: 0};
 
 const AppSlice = createSlice({
     name: "app",
@@ -14,10 +14,15 @@ const AppSlice = createSlice({
             else
             {
                 state.isLogined = false
+                window.location.reload();
             }
+        },
+        setActivePath (state, action) 
+        {
+            state.activePath = action.payload;
         }
     }
 })
 
 export default AppSlice.reducer;
-export const {setLoginState} = AppSlice.actions;
+export const {setLoginState, setActivePath} = AppSlice.actions;

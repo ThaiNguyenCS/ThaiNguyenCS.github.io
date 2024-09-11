@@ -76,9 +76,10 @@ const Flashcard = () => {
         <>
             <div className={`${styles["container"]} `}>
                 <div className={styles["title"]}>Flashcard</div>
+                <div className={styles["stat"]}>{flashcardCollections?.length} collections</div>
                 <div className={styles["option-container"]}>
                     <button
-                        className={styles["option-button"]}
+                        className={styles["add-button"]}
                         onClick={() => {
                             openCreatePopup();
                         }}

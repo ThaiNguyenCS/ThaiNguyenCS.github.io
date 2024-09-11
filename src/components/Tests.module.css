@@ -1,6 +1,11 @@
 .container {
     display: flex;
-    padding: 20px 8% 0;
+    width: 92%;
+    margin: 20px 4% 0;
+    padding: 30px 4%;
+    background-color: white;
+    border-radius: var(--container-border-radius);
+    border: var(--container-border);
 }
 
 .title {

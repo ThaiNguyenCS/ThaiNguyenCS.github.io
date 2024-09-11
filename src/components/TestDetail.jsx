@@ -6,7 +6,6 @@ import { Form, Link, redirect, useLoaderData } from "react-router-dom";
 import { getFormatDate } from "../helper_function/handleInput";
 
 const loader = async ({ request, params }) => {
- 
     const token = localStorage.getItem("jwt_token");
 
     const testResponse = await axios.get(`${apiURL}/tests/${params.topic}/${params.id}`);
@@ -88,7 +87,7 @@ const TestDetail = () => {
         <>
             <div className={styles["container"]}>
                 <div className={styles["test-title"]}>{test[0].testTitle || "NULL TITLE"}</div>
-                <table>
+                <table className={styles["history-table"]}>
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -118,28 +117,34 @@ const TestDetail = () => {
                             ))}
                     </tbody>
                 </table>
+                <div className={styles["choosing-section"]}>
+                    <div className={styles["title-bold"]}>Choose parts you want to practice:</div>
 
-                <Form method="POST">
-                    <input type="hidden" name="__action" value={"selectPart"} />
-                    {test &&
-                        test.map((item, idx) => (
-                            <>
-                                <label>Part {item.partOrder}</label>
-                                <input
-                                    type="checkbox"
-                                    name="part"
-                                    value={item.partOrder}
-                                    checked={checkBoxStatus[idx]}
-                                    onChange={() => {
-                                        updateCheckboxStatus(idx);
-                                    }}
-                                />
-                            </>
-                        ))}
-                    <button type="submit" disabled={!canSubmit}>
-                        Do it!
-                    </button>
-                </Form>
+                    <Form method="POST">
+                        <input type="hidden" name="__action" value={"selectPart"} />
+                        {test &&
+                            test.map((item, idx) => (
+                                <>
+                                    <div className={styles['part-container']}>
+                                        <label>Part {item.partOrder}</label>
+                                        <input
+                                            type="checkbox"
+                                            className={styles['checkbox-button']}
+                                            name="part"
+                                            value={item.partOrder}
+                                            checked={checkBoxStatus[idx]}
+                                            onChange={() => {
+                                                updateCheckboxStatus(idx);
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            ))}
+                        <button type="submit" disabled={!canSubmit} className={styles['start-button']}>
+                            Do it!
+                        </button>
+                    </Form>
+                </div>
             </div>
         </>
     );

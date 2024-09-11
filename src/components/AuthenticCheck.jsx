@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setLoginState } from "../slicers/AppSlice";
+import { getJWTToken } from "../helper_function/authentication";
 const serverURL = import.meta.env.VITE_SERVER_DOMAIN;
 
 const AuthenticCheck = () => {
@@ -10,7 +11,7 @@ const AuthenticCheck = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const jwtToken = localStorage.getItem("jwt_token");
+        const jwtToken = getJWTToken();
         if (jwtToken) {
             const res = axios
                 .get(`${serverURL}/auth/verify`, {

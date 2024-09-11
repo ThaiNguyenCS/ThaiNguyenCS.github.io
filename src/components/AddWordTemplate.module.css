@@ -1,0 +1,47 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid rgb(0, 115, 255);
+    margin-bottom: 12px;
+    border-radius: 10px;
+    padding: 10px 10px;
+}
+
+.container.focus {
+    outline: 2px solid rgb(0, 115, 255);
+    box-shadow: 0 0;
+}
+
+.word-input {
+    padding: 6px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.text-area {
+    resize: vertical;
+    min-height: 100px;
+    max-height: 300px;
+    font-size: 1rem;
+    font-family: "Roboto", "Courier New", Courier, monospace;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.active-label {
+    font-weight: 600;
+}
+
+
+.add-button {
+    background-color: rgb(13, 61, 193);
+    align-self: flex-end;
+    font-weight: 600;
+    font-size: 1rem;
+    color: rgb(242, 242, 255);
+    padding: 6px 16px;
+    cursor: pointer;
+    margin-right: 5px;
+    border: none;
+    border-radius: 6px;
+}

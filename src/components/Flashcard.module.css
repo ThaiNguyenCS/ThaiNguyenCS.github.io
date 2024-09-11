@@ -1,9 +1,13 @@
 .container
 {
-    width: 80%;
-    margin: 30px 10%;
+    width: 90%;
+    margin: 30px 5% 0;
     display: flex;
+    padding: 50px 5% 50px;
+    background-color: white;
+    border-radius: var(--container-border-radius);
     flex-direction: column;
+    border: var(--container-border);
 }
 
 .option-container
@@ -13,13 +17,23 @@
     margin-bottom: 10px;
 }
 
-.option-button
+.add-button
 {
-    width: 80px;
+    width: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(0, 81, 255);
+    color: white;
+    border-radius: 4px;
     margin-left: 5px;
+}
+
+.add-button:hover
+{
+    background-color: rgb(24, 97, 255);
 }
 
 .button-icon
@@ -32,9 +46,16 @@
 {
     font-size: 2rem;
     font-weight: 600;
-    margin-bottom: 50px;
     display: grid;
     place-items: center;
+}
+
+.stat
+{
+    font-size: 0.9rem;
+    align-self: self-end;
+    color: gray;
+    margin-bottom: 10px;
 }
 
 .flashcard-collection-container

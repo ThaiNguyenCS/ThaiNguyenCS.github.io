@@ -42,6 +42,9 @@ const MainPage = () => {
             <div className="main-page-body">
                 <Outlet></Outlet>
             </div>
+            <footer>
+
+            </footer>
         </>
     );
 };
