@@ -31,7 +31,7 @@ const action = async ({ request }) => {
     const formData = await request.formData();
     console.log(formData);
     if (formData.get("_action") === "CREATE_COLLECTION") {
-        const response = await axios.post(`${dataURL}/create-flashcard-collection`, formData, {
+        const response = await axios.post(`${dataURL}/flashcard-collection`, formData, {
             headers: {
                 Authorization: `Bearer ${token || "no_token"}`,
             },

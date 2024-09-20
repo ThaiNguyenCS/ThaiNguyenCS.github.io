@@ -1,0 +1,232 @@
+.container {
+    margin: 30px 20% 0;
+    display: flex;
+    padding: 10px 0 20px 0;
+    flex-direction: column;
+}
+
+.status-bar-container {
+    display: flex;
+}
+
+.current-question,
+.target-question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-width: 50px;
+    padding: 4px 0;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 999px;
+}
+
+.current-question {
+    background-color: rgb(99, 239, 139);
+    color: rgb(0, 60, 0);
+}
+
+.target-question {
+    background-color: rgb(227, 227, 227);
+    color: rgb(78, 78, 78);
+    transition: 500ms;
+}
+
+.target-question.while-finish {
+    box-shadow: 3px 3px 10px rgba(172, 172, 172, 0.538);
+    transform: scale(1.1) rotate(30deg);
+}
+
+.target-question.finish {
+    background-color: rgb(99, 239, 139);
+    color: rgb(0, 60, 0);
+}
+
+.status-bar {
+    flex: 8;
+    border-radius: 999px;
+    align-self: center;
+    position: relative;
+    height: 20px;
+    margin: 0 10px;
+}
+
+.status-bar-track,
+.status-bar-indicator {
+    border-radius: 999px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.status-bar-track {
+    background-color: rgb(209, 209, 209);
+}
+
+.status-bar-indicator {
+    background-color: rgb(0, 171, 0);
+    width: 0;
+    transition: width 500ms;
+}
+
+.card {
+    width: 90%;
+    align-self: center;
+    margin-top: 30px;
+    min-height: 450px;
+    padding: 10px 30px;
+    display: flex;
+    position: relative;
+    padding-top: 100px;
+    align-items: center;
+    border-radius: 20px;
+    flex-direction: column;
+    background-color: white;
+}
+
+.card.animate {
+    animation: slideleft ease-in-out 800ms 250ms;
+}
+
+.audio-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.question {
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.answer-input {
+    padding: 6px 4px;
+    text-align: center;
+    font-size: 1.2rem;
+    width: 80%;
+    height: 2.4rem;
+    margin-top: 20px;
+    outline: none;
+}
+
+.answer-input.correct {
+    border: 2px solid rgb(0, 210, 0);
+    box-shadow: 0 1px rgb(0, 175, 0);
+    color: rgb(0, 159, 0);
+}
+
+.answer-input.incorrect {
+    border: 2px solid red;
+    box-shadow: 0 1px red;
+    color: rgb(235, 0, 0);
+}
+
+.question-result {
+    margin-top: 20px;
+    font-weight: 500;
+    color: rgb(0, 159, 0);
+    font-size: 1.2rem;
+}
+
+.next-button {
+    margin-top: auto;
+    margin-bottom: 10px;
+    width: 100px;
+    padding: 10px 0;
+    border-radius: 999px;
+    border: none;
+    font-size: 1rem;
+    background-color: rgb(0, 0, 171);
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+}
+
+.next-button.animate {
+    animation: slidedown 500ms;
+}
+
+.check-button {
+    width: 100px;
+    padding: 10px 0;
+    border: none;
+    font-size: 1rem;
+    border-radius: 999px;
+    background-color: rgb(238, 238, 238);
+    color: gray;
+    margin-bottom: 10px;
+    margin-top: auto;
+    animation: appear 1000ms;
+}
+
+.check-button:hover {
+}
+
+.check-button.active {
+    background-color: rgb(123, 34, 207);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.skip-button {
+    color: rgb(134, 134, 134);
+    font-weight: 400;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    animation: appear 1000ms;
+}
+
+@keyframes slidedown {
+    to {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+}
+
+@keyframes slideleft {
+    50% {
+        transform: translateX(-30vw);
+        opacity: 0;
+    }
+    51% {
+        transform: translateX(30vw);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.skip-button:hover {
+    text-decoration: underline;
+}
+
+.notifi-container {
+    position: fixed;
+    bottom: 8vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+    left: 50%;
+    width: 500px;
+    pointer-events: none;
+    min-height: 200px;
+    transform: translateX(-50%);
+}

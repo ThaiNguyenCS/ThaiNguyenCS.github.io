@@ -30,7 +30,7 @@ const WordItem = (props) => {
             <div className={styles["container"]}>
                 <div className={styles["word-header"]}>
                     <div className={styles["word"]}>{word?.word}</div>
-                    <img src={IcAudio} className={styles["audio-button"]} onClick={() => playAudio()} />
+                    <img src={IcAudio} className="audio-button" onClick={() => playAudio()} />
                     <audio ref={audioRef}>
                         <source src={word?.audioURL} type="audio/mpeg" />
                         Your browser does not support the audio element.

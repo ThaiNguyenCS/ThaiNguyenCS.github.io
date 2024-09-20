@@ -43,13 +43,7 @@ ul
     list-style-type: disc;
 }
 
-.audio-button
-{
-    width: 1.2rem;
-    height: 1.2rem;
-    cursor: pointer;
-    margin-right: 5px;
-}
+
 
 .delete-button-icon
 {

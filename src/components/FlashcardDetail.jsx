@@ -7,6 +7,7 @@ import axios, { all } from "axios";
 import { AddWordTemplate } from "./AddWordTemplate";
 import { generateUUIDV4 } from "../helper_function/idManager";
 import { getMaxPage } from "../helper_function/handleInput";
+
 const dataURL = import.meta.env.VITE_DATA_URL;
 
 const loader = async ({ request, params }) => {
@@ -277,6 +278,11 @@ const FlashcardDetail = (props) => {
         else alert("Please try again");
     };
 
+    const goToTest = () => {
+        if (collection) navigate(`/flashcard/${collection.id}/test/?limit=${noOfPracticeWords}`);
+        else alert("Please try again");
+    };
+
     const generateControlButton = () => {
         const pageButtonArr = [];
         let startingPoint = 1; // default is the first page
@@ -331,14 +337,19 @@ const FlashcardDetail = (props) => {
             <div className={styles["container"]}>
                 <div>{collection?.title || "NULL TITLE"}</div>
                 <div>{collection?.description || ""}</div>
-                <button
-                    className={styles["learn-button"]}
-                    onClick={() => {
-                        goToLearnCollection();
-                    }}
-                >
-                    Learn
-                </button>
+                <div>
+                    <button
+                        className={styles["learn-button"]}
+                        onClick={() => {
+                            goToLearnCollection();
+                        }}
+                    >
+                        Learn
+                    </button>
+
+                    <button className={styles["learn-button"]} onClick={() => goToTest()}>Test</button>
+                </div>
+
                 <label htmlFor="practice-words-select">
                     Choose the number of words you want to practice
                     <select
@@ -392,6 +403,7 @@ const FlashcardDetail = (props) => {
                     currentWords.map((item) => <WordItem word={item} deleteWord={deleteWord} />)}
                 <div className={styles["page-controller"]}>{generateControlButton()}</div>
             </div>
+
         </>
     );
 };

@@ -27,8 +27,17 @@ import {
     FlashcardDetail,
     loader as flashcardDetailLoader,
 } from "./components/FlashcardDetail.jsx";
-import { FlashcardPractice, loader as flashcardPracticeLoader } from "./components/FlashcardPractice.jsx";
+import {
+    FlashcardPractice,
+    loader as flashcardPracticeLoader,
+    action as flashcardPracticeAction,
+} from "./components/FlashcardPractice.jsx";
 import { DictationExercises, loader as exerciseLoader } from "./components/DictationExercises.jsx";
+import {
+    FlashcardTest,
+    loader as flashcardTestLoader,
+    action as flashcardTestAction,
+} from "./components/FlashcardTest.jsx";
 
 const router = createBrowserRouter([
     {
@@ -86,6 +95,13 @@ const router = createBrowserRouter([
                 path: "flashcard/:id/practice",
                 element: <FlashcardPractice />,
                 loader: flashcardPracticeLoader,
+                action: flashcardPracticeAction,
+            },
+            {
+                path: "flashcard/:id/test",
+                element: <FlashcardTest />,
+                loader: flashcardTestLoader,
+                action: flashcardTestAction,
             },
             {
                 path: "flashcard/:id",

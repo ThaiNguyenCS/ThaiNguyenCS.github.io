@@ -12,7 +12,7 @@ const FlashcardCollectionCreatePopup = (props) => {
             _action: "CREATE_COLLECTION",
             id: generateUUIDV4(),
         });
-    };
+    };  
 
     return (
         <>

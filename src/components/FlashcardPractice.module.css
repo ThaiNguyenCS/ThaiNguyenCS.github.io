@@ -52,6 +52,19 @@
 .flipped {
     transform: rotateY(180deg);
 }
+.progress-num
+{
+    align-self: center;
+    font-weight: 500;
+    font-size: 1.2rem;
+    margin-top: 10px;
+    background-color: rgb(0, 65, 178);
+    border: 1px solid rgb(235, 235, 235);
+    color: white;
+    padding: 5px 20px;
+    text-align: center;
+    border-radius: 999px;
+}
 
 .result-card {
     visibility: hidden;
@@ -105,7 +118,7 @@
     align-self: center;
     display: grid;
     margin-top: 20px;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
 }
 
 .forget-option-button,
