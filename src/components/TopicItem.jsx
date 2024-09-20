@@ -18,7 +18,7 @@ const TopicItem = (props) => {
             >
                 <div className={styles['topic-img-holder']}>
                     <img
-                        src={youtubePoster}F
+                        src={youtubePoster}
                         alt="Youtube"
                         className={styles["topic-img"]}
                     />

@@ -38,6 +38,7 @@ import {
     loader as flashcardTestLoader,
     action as flashcardTestAction,
 } from "./components/FlashcardTest.jsx";
+import { CurrentNavigation } from "./components/CurrentNavigation.jsx";
 
 const router = createBrowserRouter([
     {
@@ -47,71 +48,126 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "home",
-                element: <div>Home page</div>,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <div>Home page</div>
+                    </>
+                ),
             },
             {
                 path: "dictation",
-                element: <DictationTopics />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <DictationTopics />
+                    </>
+                ),
                 loader: topicLoader,
             },
             {
                 path: "dictation/:topic",
-                element: <DictationExercises />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <DictationExercises />
+                    </>
+                ),
                 loader: exerciseLoader,
             },
             {
                 path: "dictation/:topic/:exerciseID",
-                element: <Dictation />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <Dictation />
+                    </>
+                ),
                 loader: dictationLoader,
             },
             {
                 path: "tests/practice/:id",
-                element: <TestPractice />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <TestPractice />
+                    </>
+                ),
                 loader: testPracticeLoader,
                 action: testPracticeAction,
             },
             {
                 path: "tests/:id/result/:historyID",
-                element: <TestResult />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <TestResult />
+                    </>
+                ),
                 loader: testResultLoader,
             },
             {
                 path: "tests/:topic/:id",
-                element: <TestDetail />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <TestDetail />
+                    </>
+                ),
                 loader: testDetailLoader,
                 action: testDetailAction,
             },
             {
-                path: "tests/:topic",
-                element: <Tests />,
-                loader: testLoader,
-            },
-            {
-                path: "tests",
-                element: <Tests />,
+                path: "tests/:topic?", // topic is optional
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <Tests />
+                    </>
+                ),
                 loader: testLoader,
             },
             {
                 path: "flashcard/:id/practice",
-                element: <FlashcardPractice />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <FlashcardPractice />
+                    </>
+                ),
                 loader: flashcardPracticeLoader,
                 action: flashcardPracticeAction,
             },
             {
                 path: "flashcard/:id/test",
-                element: <FlashcardTest />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <FlashcardTest />
+                    </>
+                ),
                 loader: flashcardTestLoader,
                 action: flashcardTestAction,
             },
             {
                 path: "flashcard/:id",
-                element: <FlashcardDetail />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <FlashcardDetail />
+                    </>
+                ),
                 action: flashcardDetailAction,
                 loader: flashcardDetailLoader,
             },
             {
                 path: "flashcard",
-                element: <Flashcard />,
+                element: (
+                    <>
+                        <CurrentNavigation />
+                        <Flashcard />
+                    </>
+                ),
                 loader: flashcardLoader,
                 action: flashcardAction,
             },

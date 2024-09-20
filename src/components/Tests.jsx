@@ -6,13 +6,14 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Calendar } from "./Calendar";
 import { useSelector } from "react-redux";
+import { getJWTToken } from "../helper_function/authentication";
 const apiURL = import.meta.env.VITE_API_URL;
 const serverDomain = import.meta.env.VITE_SERVER_DOMAIN;
 
 const loader = async ({ request, params }) => {
     console.log("loader");
-    const topicParam = params.topic || "";
-    const token = localStorage.getItem("jwt_token");
+    const topicParam = params.topic || "all";
+    const token = getJWTToken();
     const response = await axios.get(`${apiURL}/tests/${topicParam}`, {
         headers: {
             Authorization: `Bearer ${token || "no_token"}`,

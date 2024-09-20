@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { RiMenu2Line } from "react-icons/ri";
 import { IoMdSettings } from "react-icons/io";
 import "./Header.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setActivePath, setLoginState } from "../slicers/AppSlice";
 import { SettingMenu } from "./SettingMenu";
