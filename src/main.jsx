@@ -7,7 +7,7 @@ import { Dictation, loader as dictationLoader } from "./components/Dictation.jsx
 import { DictationTopics, loader as topicLoader } from "./components/DictationTopics.jsx";
 import store from "./store.js";
 import { Provider } from "react-redux";
-import { MainPage } from "./components/MainPage.jsx";
+import { loader as mainPageLoader, MainPage } from "./components/MainPage.jsx";
 import { action as loginAction, Login } from "./components/Login.jsx";
 import { SignUp, action as registerAction } from "./components/SignUp.jsx";
 import { AuthenticCheck } from "./components/AuthenticCheck.jsx";
@@ -44,6 +44,7 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <MainPage />,
+        loader: mainPageLoader,
         errorElement: <ErrorComponent />,
         children: [
             {

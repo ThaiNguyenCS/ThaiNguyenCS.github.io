@@ -3,7 +3,7 @@ import styles from "./FlashcardPractice.module.css";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import axios from "axios";
-import { getJWTToken } from "../helper_function/authentication"
+import { getJWTToken } from "../utils/authentication"
 import { useLoaderData, useSubmit } from "react-router-dom";
 const dataURL = import.meta.env.VITE_DATA_URL;
 

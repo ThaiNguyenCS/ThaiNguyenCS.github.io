@@ -13,11 +13,12 @@ import SubmitPopup from "./SubmitPopup";
 import { openPopup } from "../slicers/SubmitPopupSlice";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { handleInput as preprocessStr } from "../helper_function/handleInput";
+import { handleInput as preprocessStr } from "../utils/handleInput";
 import { Link, useLoaderData } from "react-router-dom";
 import { SpanWithDictionary } from "./SpanWithDictionary";
 import { ContextDictionary } from "./ContextDictionary";
 import { openDict, resetDict } from "../slicers/ContextDictSlice";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -43,12 +44,7 @@ const loader = async ({ params, request }) => {
 
     const token = localStorage.getItem("jwt_token");
     const res = await axios.get(
-        `${apiURL}/data/${params.topic}/${params.exerciseID}`,
-        {
-            headers: {
-                Authorization: `Bearer ${token || "no_token"}`,
-            },
-        }
+        `${apiURL}/data/${params.topic}/${params.exerciseID}`, axiosRequestWithCookieOption
     );
     let result = res.data; // {status, isSaved, data}
     let video;

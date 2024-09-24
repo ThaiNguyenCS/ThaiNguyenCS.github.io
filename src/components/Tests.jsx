@@ -6,26 +6,18 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Calendar } from "./Calendar";
 import { useSelector } from "react-redux";
-import { getJWTToken } from "../helper_function/authentication";
+import { getJWTToken } from "../utils/authentication";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 const apiURL = import.meta.env.VITE_API_URL;
 const serverDomain = import.meta.env.VITE_SERVER_DOMAIN;
 
 const loader = async ({ request, params }) => {
     console.log("loader");
     const topicParam = params.topic || "all";
-    const token = getJWTToken();
-    const response = await axios.get(`${apiURL}/tests/${topicParam}`, {
-        headers: {
-            Authorization: `Bearer ${token || "no_token"}`,
-        },
-    });
+    const response = await axios.get(`${apiURL}/tests/${topicParam}`, axiosRequestWithCookieOption);
     let streaks = null;
-    if (token) {
-        const streakResponse = await axios.get(`${serverDomain}/data/user-data/streaks`, {
-            headers: {
-                Authorization: `Bearer ${token || "no_token"}`,
-            },
-        });
+    if (document.cookie.includes("jwt_token")) {
+        const streakResponse = await axios.get(`${serverDomain}/data/user-data/streaks`, axiosRequestWithCookieOption);
         const streakData = streakResponse.data;
         if (streakData.result) {
             streaks = streakData.data;

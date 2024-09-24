@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {useNavigate} from "react-router-dom"
 import { DictationExContext } from "./Dictation"; 
 import axios from "axios";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -34,9 +35,7 @@ const SubmitPopup = (props) => {
             return;
         }
         try {
-            const res = await axios.post(`${apiURL}/save-progress`, exContext, {headers: {
-                Authorization: `Bearer ${token}`
-            }});
+            const res = await axios.post(`${apiURL}/save-progress`, exContext, axiosRequestWithCookieOption);
             const data = res.data;      
             console.log(data)      
             if(data.result)

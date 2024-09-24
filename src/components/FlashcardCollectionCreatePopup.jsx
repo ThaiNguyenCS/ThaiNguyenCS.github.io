@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./FlashcardCollectionCreatePopup.module.css";
-import { generateUUIDV4 } from "../helper_function/idManager";
+import { generateUUIDV4 } from "../utils/idManager";
 const FlashcardCollectionCreatePopup = (props) => {
     const [titleInput, setTitleInput] = useState("");
     const [descriptionInput, setDescriptionInput] = useState("");

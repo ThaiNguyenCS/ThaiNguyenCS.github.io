@@ -9,7 +9,9 @@ const dataURL = import.meta.env.VITE_DATA_URL;
 const audioURL = "https://api.dictionaryapi.dev/media/pronunciations/en/hello-au.mp3";
 
 const WordItem = (props) => {
+    console.log(props)
     const audioRef = useRef(null);
+    const containRef = useRef(null);
 
     const playAudio = () => {
         if (audioRef.current) {
@@ -21,13 +23,14 @@ const WordItem = (props) => {
         setWord(props.word);
     }, [props.word]);
 
-    const deleteWord = (wordID) => {
-        props.deleteWord(wordID);
+    const deleteWord = (wordID, element) => {
+        console.log({wordID, element})
+        props.deleteWord(wordID, element);
     };
 
     return (
         <>
-            <div className={styles["container"]}>
+            <div className={`${styles["container"]} ${props.isAnimate ? styles['animate'] : ""}`} ref={containRef} key={props.word.id || ""}>
                 <div className={styles["word-header"]}>
                     <div className={styles["word"]}>{word?.word}</div>
                     <img src={IcAudio} className="audio-button" onClick={() => playAudio()} />
@@ -52,7 +55,7 @@ const WordItem = (props) => {
                 <FaTrashAlt
                     className={styles["delete-button-icon"]}
                     onClick={() => {
-                        deleteWord(word?.id);
+                        deleteWord(word?.id, containRef.current);
                     }}
                 />
             </div>

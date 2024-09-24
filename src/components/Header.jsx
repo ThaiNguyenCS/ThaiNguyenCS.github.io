@@ -9,11 +9,11 @@ import { SettingMenu } from "./SettingMenu";
 
 const Header = () => {
     const navigate = useNavigate();
-    const isUserLogin = useSelector((state) => state.appState.isLogined);
     const activeNav = useSelector((state) => state.appState.activePath);
     const dispatch = useDispatch();
     const [isMenuOpen, setMenuOpen] = useState(false);
     const settingMenuRef = useRef(null);
+    const settingMenuButtonRef = useRef(null);
 
     useEffect(() => {
         // console.log(settingMenuRef.current);
@@ -22,16 +22,14 @@ const Header = () => {
                 // console.log(e.clientX);
                 // console.log(e.clientY);
                 const menuRect = settingMenuRef.current.getBoundingClientRect();
+                console.log(settingMenuButtonRef.current.getBoundingClientRect());
                 if (
                     e.clientX < menuRect.x ||
                     e.clientX > menuRect.right ||
                     e.clientY < menuRect.y ||
                     e.clientY > menuRect.bottom
                 ) {
-                    console.log("outside");
-                    // if (isMenuOpen) {
                     setMenuOpen(false);
-                    // }
                 }
             };
             document.addEventListener("mousedown", hideMenu);
@@ -63,9 +61,6 @@ const Header = () => {
 
     const toggleSettingMenu = (e) => {
         e.preventDefault();
-
-        console.log("toggleSettingMenu");
-
         setMenuOpen((state) => !state);
     };
 
@@ -108,11 +103,13 @@ const Header = () => {
                 </div>
 
                 <div id="setting-button">
-                    <IoMdSettings
-                        id="setting-icon"
-                        style={{ fontSize: "1.5rem" }}
-                        onClick={(e) => toggleSettingMenu(e)}
-                    />
+                    <div ref={settingMenuButtonRef}>
+                        <IoMdSettings
+                            id="setting-icon"
+                            style={{ fontSize: "1.5rem" }}
+                            onClick={(e) => toggleSettingMenu(e)}
+                        />
+                    </div>
 
                     <SettingMenu
                         settingMenuRef={settingMenuRef}

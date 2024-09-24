@@ -1,19 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
 import styles from "./FlashcardTest.module.css";
 import axios from "axios";
-import { getJWTToken } from "../helper_function/authentication";
+import { getJWTToken } from "../utils/authentication";
 import IcAudio from "../assets/ic_audio.png";
 import { NotifyBar } from "./NotifyBar";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const dataURL = import.meta.env.VITE_DATA_URL;
+const SAVE_PROGRESS = "SAVE_PROGRESS";
 
 const loader = async ({ params }) => {
-    const wordResponse = await axios.get(`${dataURL}/flashcard/${params.id}/practice-words`, {
-        headers: {
-            Authorization: `Bearer ${getJWTToken() || "no_token"}`,
-        },
-    });
+    const wordResponse = await axios.get(`${dataURL}/flashcard/${params.id}/practice-words`, axiosRequestWithCookieOption);
     const loaderData = {};
     const data = wordResponse.data;
 
@@ -27,28 +25,45 @@ const loader = async ({ params }) => {
     return loaderData;
 };
 
-const action = () => {};
+const action = async ({ request, params }) => {
+    const formData = await request.formData();
+    if (formData.get("_action") === SAVE_PROGRESS) {
+        const result = await axios.post(`${dataURL}/flashcard/${params.id}/test-result`, formData, axiosRequestWithCookieOption);
+        const data = result.data;
+        console.log("SAVE DATA", { data });
+        return { result: data.result };
+    }
+    return { result: false };
+};
 
 const FlashcardTest = () => {
     const { collection, words } = useLoaderData();
+    const actionData = useActionData();
     const [maxProgress, setMaxProgress] = useState(0);
     const [progress, setProgress] = useState(1); // for progress bar
     const [currentIdx, setCurrentIdx] = useState(0); // current word's idx
-    const notifyLifeSpan = 2400;
-    const progressBarRef = useRef(null);
-    const indicatorRef = useRef(null);
+    const notifyLifeSpan = 2400; // lifespan of a notify
+    const progressBarRef = useRef(null); // progress bar element
+    const indicatorRef = useRef(null); // indicator of progress bar element
     const cardRef = useRef(null);
-    const audioRef = useRef(null);
+    const audioRef = useRef(null); // audio button
     const targetQuestionRef = useRef(null);
+    const numberOfRightAnswer = useRef(0); // for counting right answers
     const nextQuestionButtonRef = useRef(null);
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState(""); // user's input
     const [isNext, setIsNext] = useState(false); // true when user complete the question and takes some time to review it.
     const [isFinish, setFinish] = useState(false);
-
+    const submit = useSubmit();
     const notifyQueue = useRef([]);
     const [currentNotify, setCurrentNotify] = useState(null);
-
     const [answerStatus, setAnswerStatus] = useState(0);
+    const [isProgressSave, setIsProgressSave] = useState(false);
+
+    useEffect(() => {
+        if (!actionData?.result) { // if saving progress fail enable user to try again
+            setIsProgressSave(false);
+        }
+    }, [actionData]);
 
     useEffect(() => {
         if (cardRef.current) {
@@ -57,7 +72,10 @@ const FlashcardTest = () => {
             }
             cardRef.current.addEventListener("animationend", cardAnimationCallback);
             return () => {
-                cardRef.current.removeEventListener("animationend", cardAnimationCallback);
+                if (cardRef.current) {
+                    // for safety reason
+                    cardRef.current.removeEventListener("animationend", cardAnimationCallback);
+                }
             };
         }
     }, []);
@@ -98,8 +116,8 @@ const FlashcardTest = () => {
 
     const nextQuestion = () => {
         setTimeout(() => {
-            setAnswerStatus(0)
-        }, 650)
+            setAnswerStatus(0);
+        }, 650);
         if (!isFinish) {
             nextQuestionButtonRef.current.classList.add(styles["animate"]);
             cardRef.current.classList.add(styles["animate"]);
@@ -109,12 +127,14 @@ const FlashcardTest = () => {
     const evaluateAnswer = () => {
         let formattedAns = input.trim().toLowerCase();
         if (formattedAns === words[currentIdx].word) {
-            console.log("true");
             setAnswerStatus(1);
+            numberOfRightAnswer.current++;
         } else {
-            console.log("false");
             setAnswerStatus(-1);
         }
+
+        words[currentIdx].answer = formattedAns; // store the answer
+
         if (progress === maxProgress) {
             setFinish(true);
             if (targetQuestionRef) {
@@ -139,7 +159,6 @@ const FlashcardTest = () => {
             if (!currentNotify) {
                 displayNotify(<NotifyBar key={Math.random()} message="No audio for this word"></NotifyBar>);
             } else {
-                console.log("daw");
                 notifyQueue.current.push(<NotifyBar key={Math.random()} message="No audio for this word"></NotifyBar>);
             }
         }
@@ -147,7 +166,6 @@ const FlashcardTest = () => {
 
     const runNextNotification = () => {
         if (notifyQueue.current.length > 0) {
-            console.log("next");
             displayNotify(notifyQueue.current.at(-1));
             notifyQueue.current = notifyQueue.current.slice(0, -1);
         }
@@ -168,6 +186,27 @@ const FlashcardTest = () => {
             return styles["incorrect"];
         }
         return "";
+    };
+
+    const saveProgress = () => {
+        setIsProgressSave(true)
+        const formData = new FormData();
+        console.log(words);
+        formData.append("_action", "SAVE_PROGRESS");
+        formData.append("collectionID", collection.id);
+        formData.append("testResult", numberOfRightAnswer.current);
+        formData.append(
+            "words",
+            JSON.stringify(
+                words.map((item) => {
+                    return {
+                        id: item.id,
+                        answer: item.answer || "",
+                    };
+                })
+            )
+        );
+        submit(formData, { method: "POST" });
     };
 
     return (
@@ -217,13 +256,22 @@ const FlashcardTest = () => {
                                     onClick={() => {
                                         evaluateAnswer();
                                     }}
+                                    disabled={!input}
                                 >
                                     Check
                                 </button>
                                 <div className={styles["skip-button"]}>Skip</div>
                             </>
                         ))}
-                    {isFinish && <button className={`${styles["check-button"]} ${styles["active"]}`}>Finish</button>}
+                    {isFinish && (
+                        <button
+                            className={`${styles["check-button"]} ${isProgressSave ? "" : styles["active"]}`}
+                            onClick={() => saveProgress()}
+                            disabled={isProgressSave}
+                        >
+                            Finish
+                        </button>
+                    )}
                 </div>
             </div>
             <div className={styles["notifi-container"]}>{currentNotify}</div>

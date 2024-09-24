@@ -1,4 +1,4 @@
-import { monthNames } from "../helper_function/timeHandling";
+import { monthNames } from "../utils/timeHandling";
 
 function handleInput(str) {
     let input = str;

@@ -5,16 +5,13 @@ import { IoIosAdd } from "react-icons/io";
 import { FlashcardCollectionCreatePopup } from "./FlashcardCollectionCreatePopup";
 import axios from "axios";
 import { redirect, useLoaderData, useLocation, useSubmit } from "react-router-dom";
-import { getJWTToken } from "../helper_function/authentication";
+import { getJWTToken } from "../utils/authentication";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 const dataURL = import.meta.env.VITE_DATA_URL;
 
 const loader = async () => {
     const token = getJWTToken();
-    const response = await axios.get(`${dataURL}/flashcard`, {
-        headers: {
-            Authorization: `Bearer ${token || "no_token"}`,
-        },
-    });
+    const response = await axios.get(`${dataURL}/flashcard`, axiosRequestWithCookieOption);
     const data = response.data;
     if (data.result) {
         console.log(data.data);
@@ -31,11 +28,7 @@ const action = async ({ request }) => {
     const formData = await request.formData();
     console.log(formData);
     if (formData.get("_action") === "CREATE_COLLECTION") {
-        const response = await axios.post(`${dataURL}/flashcard-collection`, formData, {
-            headers: {
-                Authorization: `Bearer ${token || "no_token"}`,
-            },
-        });
+        const response = await axios.post(`${dataURL}/flashcard-collection`, formData, axiosRequestWithCookieOption);
         const data = response.data;
         if (data.result) {
             return redirect(`/flashcard/${formData.get("id")}`);
@@ -50,7 +43,7 @@ const Flashcard = () => {
     const submit = useSubmit();
     const currentURL = useLocation();
     useEffect(() => {
-        return () => (document.querySelector("body").style.overflow = "scroll"); // prevent scrolling while popup's triggered
+        return () => (document.querySelector("body").style.overflow = "auto"); // return the intact state of body 
     }, []);
 
     const openCreatePopup = () => {

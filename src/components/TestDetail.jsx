@@ -3,17 +3,14 @@ const apiURL = import.meta.env.VITE_API_URL;
 import axios from "axios";
 import styles from "./TestDetail.module.css";
 import { Form, Link, redirect, useLoaderData } from "react-router-dom";
-import { getFormatDate } from "../helper_function/handleInput";
+import { getFormatDate } from "../utils/handleInput";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const loader = async ({ request, params }) => {
     const token = localStorage.getItem("jwt_token");
 
     const testResponse = await axios.get(`${apiURL}/tests/${params.topic}/${params.id}`);
-    const testHistories = await axios.get(`${apiURL}/test/practice/${params.id}/history`, {
-        headers: {
-            Authorization: `Bearer ${token || "no_token"}`,
-        },
-    });
+    const testHistories = await axios.get(`${apiURL}/test/practice/${params.id}/history`, axiosRequestWithCookieOption);
     const test = testResponse.data;
     const histories = testHistories.data;
     const obj = {};

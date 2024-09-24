@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./TestItem.module.css";
 import { useNavigate } from "react-router-dom";
-import { getFormatDate } from "../helper_function/handleInput";
+import { getFormatDate } from "../utils/handleInput";
 
 
 const TestItem = (props) => {

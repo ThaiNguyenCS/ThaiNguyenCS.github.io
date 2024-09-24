@@ -1,40 +1,39 @@
 import React, { useEffect } from "react";
 import { Header } from "./Header";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLoaderData } from "react-router-dom";
 import axios from "axios";
-import "./Header.css"
+import "./Header.css";
 import { useDispatch } from "react-redux";
 import { setLoginState } from "../slicers/AppSlice";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 const serverURL = import.meta.env.VITE_SERVER_DOMAIN;
+
+const loader = async ({ request, params }) => {
+    try {
+        const res = await axios.get(`${serverURL}/auth/verify`, axiosRequestWithCookieOption);
+
+        const data = res.data;
+        if (data.email) {
+            return { login: true };
+        } else {
+            return { login: false };
+        }
+    } catch (error) {
+        console.log(error);
+        return { login: false };
+    }
+};
 
 const MainPage = () => {
     console.log("MainPage render");
     const dispatch = useDispatch();
+    const loaderData = useLoaderData();
 
     useEffect(() => {
-        const jwtToken = localStorage.getItem("jwt_token");
-        if (jwtToken) {
-            const res = axios
-                .get(`${serverURL}/auth/verify`, {
-                    headers: {
-                        Authorization: `Bearer ${jwtToken}`,
-                    },
-                    withCredentials: true,
-                })
-                .then((res) => res.data)
-                .then((data) => {
-                    console.log(data);
-                    if (data.email) {
-                        dispatch(setLoginState(true));
-                    } else {
-                        dispatch(setLoginState(false));
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+        if (loaderData.login) {
+            dispatch(setLoginState(true));
         }
-    }, []);
+    }, [loaderData]);
 
     return (
         <>
@@ -42,11 +41,9 @@ const MainPage = () => {
             <div className="main-page-body">
                 <Outlet></Outlet>
             </div>
-            <footer>
-
-            </footer>
+            <footer></footer>
         </>
     );
 };
 
-export { MainPage };
+export { MainPage, loader };

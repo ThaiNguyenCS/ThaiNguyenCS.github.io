@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from "react";
-import "./Login.css";
+import styles from "./Login.module.css";
 import { Form, useActionData, useNavigate, useSubmit } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setLoginState } from "../slicers/AppSlice";
+
+import IcGoogle from "../assets/ic_google.png";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const serverURL = import.meta.env.VITE_SERVER_DOMAIN;
 
 const action = async ({ request, params }) => {
     console.log(request);
     const data = await request.formData();
-    const res = await axios.post(`${serverURL}/auth/login`, data);
+    const res = await axios.post(`${serverURL}/auth/login`, data, axiosRequestWithCookieOption);
     console.log(res.headers);
     const returnData = res.data;
     if (returnData.result) {
-        localStorage.setItem("jwt_token", returnData.token);
+        // localStorage.setItem("jwt_token", returnData.token);
         return returnData;
     }
     return returnData;
@@ -28,7 +31,6 @@ const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    
     useEffect(() => {
         console.log(loginStatus);
         if (loginStatus) {
@@ -38,7 +40,7 @@ const Login = () => {
                 } else {
                     console.log("login successfully");
                     dispatch(setLoginState(true));
-                    navigate("/home", {replace: true}); // back to the home page and clear login page
+                    navigate("/home", { replace: true }); // back to the home page and clear login page
                 }
             }
         }
@@ -65,16 +67,17 @@ const Login = () => {
         const formData = new FormData(e.target);
         submit(formData, { action: "/login", method: "POST" });
     };
+
+    const loginWithGoogle = () => {
+        window.location.href = "http://localhost:5000/auth/login/google";
+    };
+
     return (
-        <div className="login-page-container">
-            <div className="login-form-container">
-                <Form
-                    action="/login"
-                    method="POST"
-                    onSubmit={(e) => handleLogin(e)}
-                >
-                    <div>
-                        <label htmlFor="emailInput">Email</label>
+        <div className={styles["login-page-container"]}>
+            <div className={styles["login-form-container"]}>
+                <h1>Login</h1>
+                <Form action="/login" method="POST" onSubmit={(e) => handleLogin(e)} className={styles["login-form"]}>
+                    <div className={styles["input-group"]}>
                         <input
                             id="emailInput"
                             type="email"
@@ -82,9 +85,17 @@ const Login = () => {
                             value={email}
                             onChange={(e) => handleEmailInput(e)}
                         />
+                        <label htmlFor="emailInput" className={styles["label-line"]}>
+                            Email
+                        </label>
                     </div>
-                    <div>
-                        <label htmlFor="passwordInput">Password</label>
+                    <div
+                        className={styles["input-group"]}
+                        onFocus={(e) => {
+                            console.log(e);
+                        }}
+                        onBlur={(e) => console.log(e)}
+                    >
                         <input
                             id="passwordInput"
                             type="password"
@@ -92,9 +103,24 @@ const Login = () => {
                             value={password}
                             onChange={(e) => handlePasswordInput(e)}
                         />
+                        <label htmlFor="passwordInput" className={styles["label-line"]}>
+                            Password
+                        </label>
                     </div>
-                    <button type="submit">Login</button>
+                    <button type="submit" className={styles["login-button"]}>
+                        Login
+                    </button>
                 </Form>
+                <div className={styles["alternative-login-notify"]}>or login using</div>
+                <div
+                    className={styles["third-party-login"]}
+                    onClick={() => {
+                        loginWithGoogle();
+                    }}
+                >
+                    <img src={IcGoogle} alt="Google Icon" className={styles["icon-30"]} />
+                    <span>Sign in with Google</span>
+                </div>
                 <div>{loginStatus && loginStatus.msg}</div>
             </div>
         </div>

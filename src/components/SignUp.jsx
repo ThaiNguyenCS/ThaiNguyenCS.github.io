@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./SignUp.css";
 import { Form, redirect, useActionData, useSubmit } from "react-router-dom";
 import axios from "axios";
-import { checkValidRegisterPassword, checkValidRegisterUserName, checkTheSecondPassword } from "../helper_function/handleInput";
+import { checkValidRegisterPassword, checkValidRegisterUserName, checkTheSecondPassword } from "../utils/handleInput";
 const serverURL = import.meta.env.VITE_SERVER_DOMAIN;
 
 const action = async ({ request, pararms }) => {

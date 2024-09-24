@@ -13,19 +13,15 @@ import {
     getDurationStrFromSecond,
     getFormatDate,
     getPartStr,
-} from "../helper_function/handleInput";
+} from "../utils/handleInput";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const apiURL = import.meta.env.VITE_API_URL;
 
 const loader = async ({ request, params }) => {
     const token = localStorage.getItem("jwt_token");
     const response = await axios.get(
-        `${apiURL}/test/${params.id}/result/${params.historyID}`,
-        {
-            headers: {
-                Authorization: `Bearer ${token || "no_token"}`,
-            },
-        }
+        `${apiURL}/test/${params.id}/result/${params.historyID}`, axiosRequestWithCookieOption
     );
     const data = response.data;
     if (data.result) {

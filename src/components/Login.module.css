@@ -1,0 +1,139 @@
+.login-page-container {
+    display: flex;
+    background-color: rgb(228, 228, 228);
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    flex-direction: column;
+    justify-content: start;
+    padding-top: 100px;
+}
+
+.login-form-container {
+    display: flex;
+    height: 70vh;
+    width: max(45%, 400px);
+    padding: 40px 0;
+    flex-direction: column;
+    overflow-y: auto;
+    border-radius: 10px;
+    justify-content: start;
+    background-color: white;
+    align-items: center;
+}
+
+.login-form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-group {
+    position: relative;
+    height: 2.2rem;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.label-line {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    padding: 0 2px;
+    transform: translateY(-50%);
+    left: 6px;
+    background-color: white;
+    transition: 150ms;
+}
+
+.input-group input {
+    position: absolute;
+    font-size: 1rem;
+    top: 0;
+    padding: 0 5px;
+    right: 0;
+    left: 0;
+    border-radius: 3px;
+    border: 1px solid gray;
+    bottom: 0;
+}
+
+input:focus {
+    outline: 2px solid rgb(0, 102, 255);
+}
+
+input:focus + .label-line {
+    color: blue;
+    top: 0px;
+    font-size: 0.9rem;
+    left: 4px;
+    font-weight: 500;
+}
+
+.login-button {
+    width: 150px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 8px 0;
+    cursor: pointer;
+    color: rgba(104, 85, 224, 1);
+    background-color: white;
+    margin-top: 30px;
+    border: 1px solid rgba(104, 85, 224, 1);
+    border-radius: 5px;
+    transition: 150ms;
+    margin-bottom: 10px;
+}
+
+.login-button:hover {
+    background-color: rgba(104, 85, 224, 1);
+    color: white;
+}
+
+.alternative-login-notify
+{
+    color: gray;
+    font-size: 0.8rem;
+    margin-top: 50px;
+    font-weight: 500;
+}
+
+.third-party-login {
+    border-radius: 999px;
+    width: max(40%, 200px);
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: white;
+    user-select: none;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(183, 183, 183, 0.375);
+}
+
+.icon-30 {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 10px;
+    border-radius: 999px;
+    position: absolute;
+    left: 10px;
+    background-color: transparent;
+}
+
+.third-party-login:hover {
+    background-color: rgb(231, 231, 231);
+}
+
+.third-party-login:active {
+    background-color: rgb(218, 218, 218);
+}
+
+.third-party-login > span {
+    font-weight: 500;
+    font-size: 0.9rem;
+}

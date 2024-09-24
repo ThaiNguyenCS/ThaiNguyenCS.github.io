@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./Calendar.module.css";
-import { monthNames } from "../helper_function/timeHandling";
+import { monthNames } from "../utils/timeHandling";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import IcChecked from "../assets/ic_checked.png";

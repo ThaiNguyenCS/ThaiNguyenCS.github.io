@@ -10,7 +10,7 @@ import {
     convertSecondsToTime,
     getPartOrderJSONArr,
     generateSQLTimestamp,
-} from "../helper_function/handleInput";
+} from "../utils/handleInput";
 import SubmitPopup from "./SubmitPopup";
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -36,6 +36,7 @@ const action = async ({ request, params }) => {
     const token = localStorage.getItem("jwt_token");
     const submitResponse = await axios.post(`${apiURL}/test/practice/save-test-result`, formData, {
         headers: { Authorization: `Bearer ${token || "no_token"}` },
+        withCredentials: true,
     });
     if (submitResponse.data.result) {
         // database storage result

@@ -3,7 +3,8 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setLoginState } from "../slicers/AppSlice";
-import { getJWTToken } from "../helper_function/authentication";
+import { getJWTToken } from "../utils/authentication";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 const serverURL = import.meta.env.VITE_SERVER_DOMAIN;
 
 const AuthenticCheck = () => {
@@ -14,12 +15,7 @@ const AuthenticCheck = () => {
         const jwtToken = getJWTToken();
         if (jwtToken) {
             const res = axios
-                .get(`${serverURL}/auth/verify`, {
-                    headers: {
-                        Authorization: `Bearer ${jwtToken}`,
-                    },
-                    withCredentials: true,
-                })
+                .get(`${serverURL}/auth/verify`, axiosRequestWithCookieOption)
                 .then((res) => res.data)
                 .then((data) => {
                     console.log(data);

@@ -1,19 +1,16 @@
 import React from "react";
 import styles from "./DictationExercises.module.css";
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { getJWTToken } from "../helper_function/authentication";
+import { getJWTToken } from "../utils/authentication";
 
 import axios from "axios";
 import { DictationExerciseItem } from "./DictationExerciseItem";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const loader = async ({ params }) => {
     // console.log(params);
-    const res = await axios.get(`${apiUrl}/data/${params.topic}`, {
-        headers: {
-            Authorization: `Bearer ${getJWTToken() || "no_token"}`,
-        },
-    });
+    const res = await axios.get(`${apiUrl}/data/${params.topic}`, axiosRequestWithCookieOption);
     console.log(res.data); // {status, data}
     const result = res.data;
     if (result.status) {
