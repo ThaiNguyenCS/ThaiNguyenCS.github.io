@@ -9,6 +9,7 @@
     border: var(--container-border);
 }
 
+
 .option-container
 {
     display: flex;
@@ -17,15 +18,107 @@
     margin-bottom: 20px;
 }
 
+
+.flashcard-header
+{
+    display: flex;
+    align-items: center;
+}
+
+.flashcard-title, .input-title
+{
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.flashcard-description
+{
+    font-size: 0.9rem;
+    color: gray;
+    font-style: italic;
+}
+
+.input-title
+{
+    border: none;
+    margin-bottom: 10px;
+    border-bottom: 1px solid gray;
+}
+
+.input-title:focus
+{
+    outline:none;
+    border-bottom: 2px solid rgb(17, 77, 255);
+}
+
+.textarea-description
+{
+    resize: vertical;
+    font-family: inherit;
+    max-height: 300px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+}
+
+.textarea-description:focus
+{
+    outline: 2px solid rgb(17, 77, 255)
+}
+
+.edit-options
+{
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.save-edit-button, .cancel-edit-button
+{
+    width: 100px;
+    padding: 8px 0;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.save-edit-button
+{
+    margin-left: auto;
+    color: white;
+    margin-right: 5px;
+    background-color: rgb(0, 0, 172);
+    
+}
+
+.cancel-edit-button
+{
+    color: rgb(28, 28, 28);
+}
+
+.icon
+{
+    width: 1.3rem;
+    height: 1.3rem;
+    cursor: pointer;
+}
+
+.edit-button
+{
+    margin-left: 10px;
+}
+
+
 .learn-button
 {
     align-self: flex-start;
     width: 100px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     margin-top: 8px;
     border: none;
     border-radius: 9999px;
-    padding: 6px 0;
+    padding: 8px 0;
     cursor: pointer;
     color: rgb(255, 245, 240);
     font-weight: 600;
@@ -46,8 +139,8 @@
     color: rgb(242, 242, 255);
     background-color: rgb(13, 61, 193);
     font-weight: 600;
-    font-size: 1rem;
-    padding: 6px 16px;
+    font-size: 0.9rem;
+    padding: 8px 16px;
     cursor: pointer;
     margin-right: 5px;
     border: none;
@@ -56,10 +149,10 @@
 
 .delete-button {
     color: red;
-    padding: 6px 0;
+    padding: 8px 0;
     width: 90px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
     background-color: white;
     border: 1px solid rgb(227, 227, 227);
     border-radius: 6px;
@@ -112,3 +205,12 @@
     display: none;
 }
 
+.disappear {
+    animation: disappearAnim 500ms;
+}
+
+@keyframes disappearAnim {
+    to {
+        opacity: 0;
+    }
+}

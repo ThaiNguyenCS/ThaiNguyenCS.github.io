@@ -1,22 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./FlashcardDetail.module.css";
 import { WordItem } from "./WordItem";
-import { getJWTToken } from "../helper_function/authentication";
+import { getJWTToken } from "../utils/authentication";
 import { useActionData, useLoaderData, useLocation, useNavigate, useSubmit } from "react-router-dom";
 import axios, { all } from "axios";
 import { AddWordTemplate } from "./AddWordTemplate";
-import { generateUUIDV4 } from "../helper_function/idManager";
-import { getMaxPage } from "../helper_function/handleInput";
+import { generateUUIDV4 } from "../utils/idManager";
+import { getMaxPage } from "../utils/handleInput";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
+import IcEdit from "../assets/ic_edit.png";
 
 const dataURL = import.meta.env.VITE_DATA_URL;
 
 const loader = async ({ request, params }) => {
-    const token = getJWTToken();
-    const response = await axios.get(`${dataURL}/flashcard/${params.id}`, {
-        headers: {
-            Authorization: `Bearer ${token || "no_token"}`,
-        },
-    });
+    const response = await axios.get(`${dataURL}/flashcard/${params.id}`, axiosRequestWithCookieOption);
     const data = response.data;
     if (data.result) {
         return data.data;
@@ -27,14 +24,10 @@ const loader = async ({ request, params }) => {
 
 const action = async ({ request, params }) => {
     const formData = await request.formData();
-    const token = getJWTToken();
+
     if (formData.get("_action") === "DELETE_COLLECTION") {
         console.log("ACTION DELETE");
-        const response = await axios.delete(`${dataURL}/flashcard/${params.id}/delete`, {
-            headers: {
-                Authorization: `Bearer ${token || "no_token"}`,
-            },
-        });
+        const response = await axios.delete(`${dataURL}/flashcard/${params.id}/delete`, axiosRequestWithCookieOption);
         const data = response.data;
         if (data.result) {
             console.log(data.data);
@@ -44,11 +37,11 @@ const action = async ({ request, params }) => {
         return { isDeleteSuccessfully: data.result };
     } else if (formData.get("_action") === "ADD") {
         console.log("ACTION ADD");
-        const response = await axios.post(`${dataURL}/flashcard/${params.id}/add-word`, formData, {
-            headers: {
-                Authorization: `Bearer ${token || "no_token"}`,
-            },
-        });
+        const response = await axios.post(
+            `${dataURL}/flashcard/${params.id}/add-word`,
+            formData,
+            axiosRequestWithCookieOption
+        );
         const data = response.data;
         if (data.result) {
             console.log(data.data);
@@ -60,11 +53,10 @@ const action = async ({ request, params }) => {
         console.log("ACTION DELETE WORD");
         const wordID = formData.get("wordID");
         if (wordID) {
-            const response = await axios.delete(`${dataURL}/flashcard/${params.id}/words/${wordID}`, {
-                headers: {
-                    Authorization: `Bearer ${token || "no_token"}`,
-                },
-            });
+            const response = await axios.delete(
+                `${dataURL}/flashcard/${params.id}/words/${wordID}`,
+                axiosRequestWithCookieOption
+            );
             const data = response.data;
             if (data.result) {
                 console.log(data.data);
@@ -72,8 +64,21 @@ const action = async ({ request, params }) => {
                 alert("There's something wrong!");
             }
         } else console.log("No wordID");
+    } else if (formData.get("_action") === "EDIT_COLLECTION") {
+        console.log("ACTION EDIT_COLLECTION");
+        try {
+            const response = await axios.patch(
+                `${dataURL}/flashcard/${params.id}`,
+                formData,
+                axiosRequestWithCookieOption
+            );
+            const data = response.data;
+            return { isEditSuccessfully: data.result };
+        } catch (error) {
+            console.log(error);
+        }
     }
-    return { isDeleteSuccessfully: false, isAddSuccessfully: false };
+    return { isDeleteSuccessfully: false, isAddSuccessfully: false, isEditSuccessfully: false };
 };
 
 const FlashcardDetail = (props) => {
@@ -84,13 +89,16 @@ const FlashcardDetail = (props) => {
     const requesting = useRef(false);
     const [currentWords, setCurrentWords] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(10); // no of words per page
     const [noOfPracticeWords, setNoOfPracticeWords] = useState(10);
     const submit = useSubmit();
     const currentURL = useLocation();
     const actionData = useActionData();
     const navigate = useNavigate();
     const [maxPage, setMaxPage] = useState(1);
+    const newlyCreatedWordIDs = useRef([]);
+    const [modifyCollection, setModifyCollection] = useState(false); // true if you're modifying collection info
+    const [newInfo, setNewInfo] = useState({ title: "", description: "" }); // storing new collection metadata when editing
 
     const requestWords = async (isReset) => {
         console.log("requestWords");
@@ -104,9 +112,8 @@ const FlashcardDetail = (props) => {
         let start = (curPage - 1) * limit;
         let end = Math.min(start + limit, collection.noOfWords);
         let isStart = false;
+        // create a NULL array if it's the first render or a reset action
         const wordArr = firstRender.current || isReset ? new Array(collection.noOfWords).fill(null) : allWords;
-        console.log("wordArr");
-        console.log(wordArr);
         firstRender.current = false; // unmark the first render
 
         // find missing words to request
@@ -131,13 +138,12 @@ const FlashcardDetail = (props) => {
         for (let i = 1; i <= ranges.length / 2; i++) {
             queryString += `start${i}=${ranges[(i - 1) * 2]}&limit${i}=${ranges[(i - 1) * 2 + 1]}`;
         }
-        console.log("ranges");
+        // console.log("ranges");
         if (ranges.length != 0) {
-            const result = await axios.get(`${dataURL}/flashcard/${collection.id}/words/${queryString}`, {
-                headers: {
-                    Authorization: `Bearer ${getJWTToken() || "no_token"}`,
-                },
-            });
+            const result = await axios.get(
+                `${dataURL}/flashcard/${collection.id}/words/${queryString}`,
+                axiosRequestWithCookieOption
+            );
             const data = result.data;
             if (data.result) {
                 const words = data.data;
@@ -163,6 +169,10 @@ const FlashcardDetail = (props) => {
         if (actionData?.isDeleteSuccessfully) {
             navigate("/flashcard", { replace: true });
         }
+        if (actionData?.isEditSuccessfully) {
+            // if collection info is changed
+            setModifyCollection(false);
+        }
     }, [actionData]);
 
     useEffect(() => {
@@ -186,7 +196,7 @@ const FlashcardDetail = (props) => {
         if (collection) {
             setAddWordTemplate(false); // close the add word template when turn page
             if (!requesting.current) {
-                console.log("request in currentPage");
+                // console.log("request in currentPage");
                 requesting.current = true;
                 requestWords(false);
             }
@@ -195,10 +205,10 @@ const FlashcardDetail = (props) => {
 
     useEffect(() => {
         if (collection) {
-            console.log("collection change");
+            // console.log("collection change");
             setMaxPage(getMaxPage(collection.noOfWords, limit));
             if (!requesting.current) {
-                console.log("request in collection");
+                // console.log("request in collection");
                 requesting.current = true;
                 requestWords(true);
             }
@@ -206,17 +216,17 @@ const FlashcardDetail = (props) => {
     }, [collection]);
 
     useEffect(() => {
-        console.log("allWords change");
+        // console.log("allWords change");
         setDisplayWords();
     }, [allWords]);
 
     const setDisplayWords = () => {
         if (allWords.length > 0) {
-            console.log("allWords");
-            console.log(allWords);
+            // console.log("allWords");
+            // console.log(allWords);
             const displayWords = allWords.slice((currentPage - 1) * limit, currentPage * limit);
-            console.log("displayWords");
-            console.log(displayWords);
+            // console.log("displayWords");
+            // console.log(displayWords);
             setCurrentWords(displayWords);
         }
     };
@@ -247,23 +257,33 @@ const FlashcardDetail = (props) => {
         }
     };
 
-    const deleteWord = (wordID) => {
+    const deleteWord = (wordID, delElement) => {
         const result = window.confirm("Do you actually want to delete this word?");
+
         if (result && wordID) {
-            submit(
-                { _action: "DELETE_WORD", wordID },
-                {
-                    method: "DELETE",
-                    action: currentURL.pathname,
-                }
-            );
+            if (delElement) {
+                delElement.classList.add(styles["disappear"]);
+                delElement.addEventListener("animationend", () => {
+                    submit(
+                        { _action: "DELETE_WORD", wordID },
+                        {
+                            method: "DELETE",
+                            action: currentURL.pathname,
+                        }
+                    );
+                });
+            } else console.log("delElement error");
+        } else {
+            console.log("No delete");
         }
     };
 
     const addWordToDatabase = (word) => {
         const formData = new FormData();
+        const newWordID = generateUUIDV4();
         formData.append("_action", "ADD");
-        formData.append("id", generateUUIDV4());
+        formData.append("id", newWordID);
+        newlyCreatedWordIDs.current.push(newWordID); // mark this word new
         formData.append("collectionID", collection.id);
         formData.append("word", word.word);
         formData.append("definition", word.definition);
@@ -273,14 +293,36 @@ const FlashcardDetail = (props) => {
         });
     };
 
+    const isNewlyCreatedWord = (id) => {
+        const idx = newlyCreatedWordIDs.current.find((wordID) => wordID === id);
+        if (idx) {
+            newlyCreatedWordIDs.current.splice(idx, 1); // unmark this word as a new item
+            console.log("true");
+            return true; // enable animation for the first time
+        } else return false;
+    };
+
     const goToLearnCollection = () => {
         if (collection) navigate(`/flashcard/${collection.id}/practice/?limit=${noOfPracticeWords}`);
         else alert("Please try again");
     };
 
     const goToTest = () => {
-        if (collection) navigate(`/flashcard/${collection.id}/test/?limit=${noOfPracticeWords}`);
+        if (collection) navigate(`/flashcard/${collection.id}/test`);
         else alert("Please try again");
+    };
+
+    const startEditCollection = () => {
+        setModifyCollection(true);
+        setNewInfo({ title: collection.title, description: collection.description });
+    };
+
+    const saveChangesToCollectionInfo = () => {
+        const formData = new FormData();
+        formData.append("_action", "EDIT_COLLECTION");
+        formData.append("title", newInfo.title);
+        formData.append("description", newInfo.description);
+        submit(formData, { method: "PATCH" });
     };
 
     const generateControlButton = () => {
@@ -335,8 +377,65 @@ const FlashcardDetail = (props) => {
     return (
         <>
             <div className={styles["container"]}>
-                <div>{collection?.title || "NULL TITLE"}</div>
-                <div>{collection?.description || ""}</div>
+                {modifyCollection ? (
+                    <>
+                        <input
+                        className={styles['input-title']}
+                            type="text"
+                            value={newInfo.title}
+                            onChange={(e) => {
+                                setNewInfo((state) => {
+                                    return { ...state, title: e.target.value };
+                                });
+                            }}
+                        />
+                        <textarea
+                            type="text"
+                            value={newInfo.description}
+                            onChange={(e) => {
+                                setNewInfo((state) => {
+                                    return { ...state, description: e.target.value };
+                                });
+                            }}
+                            className={styles['textarea-description']}
+                        />
+                        <div className={styles['edit-options']}>
+                            <button
+                                onClick={() => {
+                                    saveChangesToCollectionInfo();
+                                }}
+                                className={styles["save-edit-button"]}
+                            >
+                                Save
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setModifyCollection(false);
+                                }}
+                                className={styles["cancel-edit-button"]}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className={styles["flashcard-header"]}>
+                            <div className={styles["flashcard-title"]}>{collection?.title || "NULL TITLE"}</div>
+                            <img
+                                src={IcEdit}
+                                alt=""
+                                className={`${styles["icon"]} ${styles["edit-button"]}`}
+                                onClick={() => {
+                                    startEditCollection();
+                                }}
+                            />
+                        </div>
+
+                        <div className={styles["flashcard-description"]}>{collection?.description || ""}</div>
+                    </>
+                )}
+
                 <div>
                     <button
                         className={styles["learn-button"]}
@@ -347,7 +446,9 @@ const FlashcardDetail = (props) => {
                         Learn
                     </button>
 
-                    <button className={styles["learn-button"]} onClick={() => goToTest()}>Test</button>
+                    <button className={styles["learn-button"]} onClick={() => goToTest()}>
+                        Test
+                    </button>
                 </div>
 
                 <label htmlFor="practice-words-select">
@@ -400,10 +501,11 @@ const FlashcardDetail = (props) => {
                 <AddWordTemplate active={addWordTemplate} addWord={addWordToDatabase} />
                 {currentWords &&
                     currentWords.length > 0 &&
-                    currentWords.map((item) => <WordItem word={item} deleteWord={deleteWord} />)}
+                    currentWords.map((item) => (
+                        <WordItem word={item} deleteWord={deleteWord} isAnimate={isNewlyCreatedWord(item.id)} />
+                    ))}
                 <div className={styles["page-controller"]}>{generateControlButton()}</div>
             </div>
-
         </>
     );
 };
