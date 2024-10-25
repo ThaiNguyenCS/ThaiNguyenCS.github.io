@@ -9,16 +9,18 @@ const loader = async () => {
     const result = res.data;
     if (result.status) {
         return result.data;
+    } else {
+        console.log(`error at DictationTopics loader ${result.error}`);
+        return null;
     }
-    console.log(`error at DictationTopics loader ${result.error}`);
-    return null;
 };
 
 const DictationTopics = () => {
+
     const topicArr = useLoaderData();
     return (
         <>
-            <div className={styles['container']}>
+            <div className={styles["container"]}>
                 <div className={styles["title"]}>Dictation</div>
                 <div className={styles["topic-container"]}>
                     {topicArr &&
@@ -36,4 +38,6 @@ const DictationTopics = () => {
     );
 };
 
-export { DictationTopics, loader };
+export default DictationTopics;
+
+export { loader };

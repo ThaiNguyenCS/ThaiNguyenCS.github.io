@@ -3,13 +3,11 @@ const apiURL = import.meta.env.VITE_API_URL;
 import axios from "axios";
 import styles from "./TestDetail.module.css";
 import { Form, Link, redirect, useLoaderData } from "react-router-dom";
-import { getFormatDate } from "../utils/handleInput";
+import { getFormatDateTime } from "../utils/timeHandling";
 import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const loader = async ({ request, params }) => {
-    const token = localStorage.getItem("jwt_token");
-
-    const testResponse = await axios.get(`${apiURL}/tests/${params.topic}/${params.id}`);
+    const testResponse = await axios.get(`${apiURL}/tests/${params.topic}/${params.id}/view`);
     const testHistories = await axios.get(`${apiURL}/test/practice/${params.id}/history`, axiosRequestWithCookieOption);
     const test = testResponse.data;
     const histories = testHistories.data;
@@ -84,9 +82,9 @@ const TestDetail = () => {
         <>
             <div className={styles["container"]}>
                 <div className={styles["test-title"]}>{test[0].testTitle || "NULL TITLE"}</div>
-                <table className={styles["history-table"]}>
-                    <thead>
-                        <tr>
+                <table className={`${styles["history-table"]} ${styles["module-table"]}`}>
+                    <thead className={styles["module-thead"]}>
+                        <tr className={styles["module-tr"]}>
                             <th>Date</th>
                             <th>Parts</th>
                             <th>Duration</th>
@@ -94,19 +92,23 @@ const TestDetail = () => {
                             <th>Details</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={styles["module-tbody"]}>
                         {testHistories &&
                             testHistories.length > 0 &&
                             testHistories.map((history) => (
                                 <>
-                                    <tr>
-                                        <td>{getFormatDate(history.startingTime)}</td>
-                                        <td>{getPartStr(history.partArr)}</td>
-                                        <td>{getDurationStrFromSecond(history.duration)}</td>
-                                        <td>
+                                    <tr className={styles["module-tr"]}>
+                                        <td className={styles["module-td"]}>
+                                            {getFormatDateTime(history.startingTime)}
+                                        </td>
+                                        <td className={styles["module-td"]}>{getPartStr(history.partArr)}</td>
+                                        <td className={styles["module-td"]}>
+                                            {getDurationStrFromSecond(history.duration)}
+                                        </td>
+                                        <td className={styles["module-td"]}>
                                             {history.noOfCorrectQuestions}/{history.totalQuestions}
                                         </td>
-                                        <td>
+                                        <td className={styles["module-td"]}>
                                             <Link to={`/tests/${history.testID}/result/${history.id}`}>Review</Link>
                                         </td>
                                     </tr>
@@ -122,11 +124,11 @@ const TestDetail = () => {
                         {test &&
                             test.map((item, idx) => (
                                 <>
-                                    <div className={styles['part-container']}>
+                                    <div className={styles["part-container"]}>
                                         <label>Part {item.partOrder}</label>
                                         <input
                                             type="checkbox"
-                                            className={styles['checkbox-button']}
+                                            className={styles["checkbox-button"]}
                                             name="part"
                                             value={item.partOrder}
                                             checked={checkBoxStatus[idx]}
@@ -137,7 +139,7 @@ const TestDetail = () => {
                                     </div>
                                 </>
                             ))}
-                        <button type="submit" disabled={!canSubmit} className={styles['start-button']}>
+                        <button type="submit" disabled={!canSubmit} className={styles["start-button"]}>
                             Do it!
                         </button>
                     </Form>

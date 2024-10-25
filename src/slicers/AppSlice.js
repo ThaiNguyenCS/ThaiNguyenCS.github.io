@@ -1,21 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {isLogined: false, activePath: 0};
+const initialState = {isLogined: false, activePath: 0, email: "", appname: ""};
 
 const AppSlice = createSlice({
     name: "app",
     initialState: initialState,
     reducers: {
         setLoginState (state, action) {
-            if(action.payload)
-            {
-                state.isLogined = true
-            }
-            else
-            {
-                state.isLogined = false
-                window.location.reload();
-            }
+            const payload = action.payload
+                state.isLogined = payload.login
+                state.email = payload.email
+                state.appname = payload.appname
+                if(!payload.login)
+                    window.location.reload(); // if user logged out, reload page
         },
         setActivePath (state, action) 
         {

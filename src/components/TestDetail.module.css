@@ -52,29 +52,29 @@
     padding: 4px 30px;
 }
 
-table {
+.module-table {
     border-collapse: collapse;
 }
 
-th,
-td {
+.module-th,
+.module-td {
     border-top: 1px solid rgb(215, 215, 215);
     text-align: center;
 }
 
-th {
+.module-th {
     padding: 6px 16px;
     font-size: 1rem;
 }
 
-td {
+.module-td  {
     padding: 4px 16px;
     font-size: 0.95rem;
 }
-tr:last-child {
+.module-tr:last-child {
     border-bottom: 1px solid rgb(215, 215, 215);
 }
 
-tbody tr:nth-child(even) {
+.module-tbody .module-tr:nth-child(even) {
     background-color: rgb(242, 242, 242);
 }

@@ -1,0 +1,83 @@
+.container {
+    width: 70%;
+    margin: 20px 15% 0;
+    background-color: white;
+    padding: 30px 5%;
+}
+
+.user-name
+{
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+.reminder-header
+{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+.section-label {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.add-reminder-button {
+    margin-left: 10px;
+    background-color: rgb(0, 0, 147);
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 10px;
+}
+
+.module-table
+{
+    border-collapse: collapse;
+}
+
+.module-tr
+{   
+    border-top: 1px solid rgb(200, 200, 200);
+}
+
+.module-th
+{   
+    padding: 10px 0;
+}
+
+.module-td
+{   
+    padding: 6px 10px;
+}
+
+.module-td.task
+{   
+    font-weight: 500;
+}
+
+.edit-button-icon
+{
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    display: block;
+}
+
+.delete-button
+{
+    color: rgb(231, 0, 0);
+    cursor: pointer;
+}
+
+.delete-button:hover
+{
+    
+    text-decoration: underline;
+}

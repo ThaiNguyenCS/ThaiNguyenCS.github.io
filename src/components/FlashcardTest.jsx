@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useActionData, useLoaderData, useSubmit } from "react-router-dom";
+import { Navigate, redirect, useActionData, useLoaderData, useNavigate, useSubmit } from "react-router-dom";
 import styles from "./FlashcardTest.module.css";
 import axios from "axios";
 import { getJWTToken } from "../utils/authentication";
@@ -31,6 +31,10 @@ const action = async ({ request, params }) => {
         const result = await axios.post(`${dataURL}/flashcard/${params.id}/test-result`, formData, axiosRequestWithCookieOption);
         const data = result.data;
         console.log("SAVE DATA", { data });
+        if(data.result)
+        {
+            return redirect(`/flashcard/${params.id}`);
+        }
         return { result: data.result };
     }
     return { result: false };
@@ -58,6 +62,7 @@ const FlashcardTest = () => {
     const [currentNotify, setCurrentNotify] = useState(null);
     const [answerStatus, setAnswerStatus] = useState(0);
     const [isProgressSave, setIsProgressSave] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!actionData?.result) { // if saving progress fail enable user to try again

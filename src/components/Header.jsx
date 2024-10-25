@@ -39,6 +39,10 @@ const Header = () => {
         }
     }, [isMenuOpen]);
 
+    const closeMenu = () => {
+        setMenuOpen(false);
+    }
+
     const backToMainPage = (navStatus) => {
         dispatch(setActivePath(Number(navStatus)));
         navigate("/home");
@@ -113,7 +117,8 @@ const Header = () => {
 
                     <SettingMenu
                         settingMenuRef={settingMenuRef}
-                        className={`setting-drop-menu ${isMenuOpen ? "visible" : ""}`}
+                        className={isMenuOpen ? "visible" : ""}
+                        closeMenu={closeMenu}
                     />
                 </div>
             </header>

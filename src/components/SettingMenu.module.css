@@ -2,7 +2,7 @@
     position: absolute;
     top: 40px;
     right: 10px;
-    width: 200px;
+    width: 300px;
     padding: 10px 5px;
     height: 0;
     transition: height 500ms;
@@ -19,6 +19,52 @@
 .setting-drop-menu.visible {
     height: 150px;
     visibility: visible;
+}
+.user-card
+{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    max-height: 2.2rem;
+}
+
+.user-avt
+{
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 999px;
+    background-color: aqua;
+}
+
+.user-info-section
+{
+    display: flex;
+    margin-left: 10px;
+    flex-direction: column;
+}
+
+.user-name
+{
+    height: 1.2rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    overflow: hidden;
+}
+
+.visit-profile
+{
+    font-size: 0.9rem;
+    color: gray;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.visit-profile:hover
+{
+    text-decoration: underline;
 }
 
 

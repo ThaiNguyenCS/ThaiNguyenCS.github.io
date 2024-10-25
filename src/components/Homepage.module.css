@@ -1,0 +1,95 @@
+.container
+{
+    width: 90%;
+    margin: 30px 5% 0;
+    background-color: white;
+    padding: 20px 2%;
+    border: var(--container-border);
+    border-radius: var(--container-border-radius);
+}
+
+.section-container
+{
+    margin-bottom: 30px;
+}
+
+.section-title
+{
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.finish-task
+{
+    text-decoration: line-through;
+}
+
+
+.status-select
+{
+    border: 1px solid rgb(197, 197, 197);
+    border-radius: 999px;
+    padding: 2px 4px;
+}
+
+.tests-grid-layout {
+    display: grid;
+    width: 90%;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    margin-bottom: 20px;
+    column-gap: 8px;
+}
+
+.reminder-table
+{
+    border-collapse: collapse;
+}
+
+.reminder-thead
+{
+    background-color: rgb(244, 244, 244);
+}
+
+.reminder-tr
+{
+    border-top: 1px solid rgb(192, 192, 192);
+}
+
+
+.reminder-tr:last-child
+{
+    border-bottom: 1px solid rgb(192, 192, 192);
+}
+
+
+
+.reminder-tr:nth-child(even)
+{
+    background-color: rgb(241, 241, 241);
+}
+
+.reminder-td 
+{
+    padding: 10px;
+}
+
+.reminder-td.status-td
+{
+    padding: 0 20px;
+}
+
+.reminder-td.task-td 
+{
+    min-width: 500px;
+}
+
+.reminder-th
+{
+    padding: 10px 0;
+}
+
+
+

@@ -113,19 +113,7 @@ const getDurationStrFromSecond = (second) => {
         .padStart(2, "0")}`;
 };
 
-const getFormatDate = (dateStr) => {
-    if (dateStr) {
-        const date = new Date(dateStr);
-        return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date
-            .getHours()
-            .toString()
-            .padStart(2, 0)}:${date.getMinutes().toString().padStart(2, 0)}:${date
-            .getSeconds()
-            .toString()
-            .padStart(2, 0)}`;
-    }
-    return "null date";
-};
+
 
 const getMaxPage = (noOfWords, limit) => {
     const floorNum = Math.floor(noOfWords / limit);
@@ -142,6 +130,8 @@ const getPartStr = (partJSON) => {
     return partArr.join(", ");
 };
 
+
+
 export {
     handleInput,
     checkValidRegisterPassword,
@@ -152,7 +142,6 @@ export {
     generateSQLTimestamp,
     getPartOrderJSONArr,
     getPartStr,
-    getFormatDate,
     getDurationStrFromSecond,
     getMaxPage,
 };

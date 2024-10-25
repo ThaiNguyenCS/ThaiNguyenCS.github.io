@@ -101,17 +101,15 @@ const FlashcardDetail = (props) => {
     const [newInfo, setNewInfo] = useState({ title: "", description: "" }); // storing new collection metadata when editing
 
     const requestWords = async (isReset) => {
-        console.log("requestWords");
+        console.log("requestWords", currentPage, maxPage);
+
         const ranges = []; // always has even number of elements
         let curPage = currentPage;
-        if (currentPage > getMaxPage(collection.noOfWords, limit)) {
-            // if currentPage is greater than the maxPage
-            curPage--;
-            setCurrentPage((state) => state - 1);
-        }
         let start = (curPage - 1) * limit;
         let end = Math.min(start + limit, collection.noOfWords);
         let isStart = false;
+        console.log(start, end);
+
         // create a NULL array if it's the first render or a reset action
         const wordArr = firstRender.current || isReset ? new Array(collection.noOfWords).fill(null) : allWords;
         firstRender.current = false; // unmark the first render
@@ -190,9 +188,11 @@ const FlashcardDetail = (props) => {
             }
             setMaxPage(getMaxPage(collection.noOfWords, limit)); // re-evaluate the max page based on current limit
         }
-    }, [limit]);
+    }, [limit]); // changes in limit
 
     useEffect(() => {
+        console.log("useEffect currentPage", currentPage);
+
         if (collection) {
             setAddWordTemplate(false); // close the add word template when turn page
             if (!requesting.current) {
@@ -237,11 +237,11 @@ const FlashcardDetail = (props) => {
     };
 
     const turnToTheNextPage = () => {
-        setCurrentPage((pageNum) => pageNum + 1);
+        if (currentPage < maxPage) setCurrentPage((pageNum) => pageNum + 1);
     };
 
     const returnToThePrevPage = () => {
-        setCurrentPage((pageNum) => pageNum - 1);
+        if (currentPage > 0) setCurrentPage((pageNum) => pageNum - 1);
     };
 
     const deleteThisCollection = () => {
@@ -326,14 +326,17 @@ const FlashcardDetail = (props) => {
     };
 
     const generateControlButton = () => {
+        console.log("generateControlButton");
+
         const pageButtonArr = [];
-        let startingPoint = 1; // default is the first page
+        let startingPoint; // default is the first page
         if (currentPage === 1) {
         } else if (currentPage === maxPage) {
             startingPoint = Math.max(maxPage - 2, 1);
         } else {
             startingPoint = currentPage - 1;
         }
+        startingPoint = 1; // ensure the min is always 1
         for (let p = startingPoint; p <= Math.min(startingPoint + 2, maxPage); p++) {
             pageButtonArr.push(
                 <div
@@ -380,7 +383,7 @@ const FlashcardDetail = (props) => {
                 {modifyCollection ? (
                     <>
                         <input
-                        className={styles['input-title']}
+                            className={styles["input-title"]}
                             type="text"
                             value={newInfo.title}
                             onChange={(e) => {
@@ -397,9 +400,9 @@ const FlashcardDetail = (props) => {
                                     return { ...state, description: e.target.value };
                                 });
                             }}
-                            className={styles['textarea-description']}
+                            className={styles["textarea-description"]}
                         />
-                        <div className={styles['edit-options']}>
+                        <div className={styles["edit-options"]}>
                             <button
                                 onClick={() => {
                                     saveChangesToCollectionInfo();

@@ -7,6 +7,7 @@
     --header-height: 60px;
     --container-border: 1px solid rgb(232, 232, 232);
     --container-border-radius: 10px;
+    --blue-button: rgb(11, 50, 158);
 }
 
 body
@@ -37,4 +38,9 @@ footer
     height: 1.2rem;
     cursor: pointer;
     margin-right: 5px;
+}
+
+table 
+{
+    border-collapse: collapse;
 }

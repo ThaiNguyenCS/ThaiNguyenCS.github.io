@@ -9,7 +9,6 @@ const TopicItem = (props) => {
     const handleNavigation = (url) => {
         navigate(`/dictation/${url}`);
     };
-
     return (
         <>
             <div

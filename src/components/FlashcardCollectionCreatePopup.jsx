@@ -12,7 +12,7 @@ const FlashcardCollectionCreatePopup = (props) => {
             _action: "CREATE_COLLECTION",
             id: generateUUIDV4(),
         });
-    };  
+    };
 
     return (
         <>
@@ -40,8 +40,19 @@ const FlashcardCollectionCreatePopup = (props) => {
                             onChange={(e) => setDescriptionInput(e.target.value)}
                             className={`${styles["description-textarea"]} ${styles["input-text-format"]}`}
                         />
-                        <button onClick={() => {createCollection()}}>Create</button>
-                        <button onClick={() => props.closePopup()}>Close</button>
+                        <div className={styles['option-container']}>
+                            <button
+                                className={styles["create-button"]}
+                                onClick={() => {
+                                    createCollection();
+                                }}
+                            >
+                                Create
+                            </button>
+                            <button className={styles["close-button"]} onClick={() => props.closePopup()}>
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             ) : (

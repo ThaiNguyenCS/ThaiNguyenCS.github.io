@@ -20,7 +20,7 @@ const AuthenticCheck = () => {
                 .then((data) => {
                     console.log(data);
                     if (data.email) {
-                        dispatch(setLoginState(true));
+                        dispatch(setLoginState({login: true, email: data.email, appname: data.appname}));
                         const timeout = setTimeout(() => {
                             navigate("/home", {replace: true});
                         }, 3000);
@@ -30,7 +30,7 @@ const AuthenticCheck = () => {
                             clearTimeout(timeout);
                         };
                     } else {
-                        dispatch(setLoginState(false));
+                        dispatch(setLoginState({login: false, email: "", appname: ""}));
                     }
                 })
                 .catch((error) => {

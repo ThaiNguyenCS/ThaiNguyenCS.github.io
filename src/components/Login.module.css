@@ -71,6 +71,14 @@ input:focus + .label-line {
     font-weight: 500;
 }
 
+.label-line.non-empty {
+    top: 0px;
+    font-size: 0.9rem;
+    left: 4px;
+    font-weight: 500;
+}
+
+
 .login-button {
     width: 150px;
     font-size: 0.9rem;

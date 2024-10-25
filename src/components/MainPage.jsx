@@ -1,11 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "./Header";
-import { Outlet, useLoaderData } from "react-router-dom";
+import { Outlet, useLoaderData, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Header.css";
 import { useDispatch } from "react-redux";
 import { setLoginState } from "../slicers/AppSlice";
 import { axiosRequestWithCookieOption } from "../utils/requestOption";
+import { Suspense } from "react";
+
+
 const serverURL = import.meta.env.VITE_SERVER_DOMAIN;
 
 const loader = async ({ request, params }) => {
@@ -14,9 +17,9 @@ const loader = async ({ request, params }) => {
 
         const data = res.data;
         if (data.email) {
-            return { login: true };
+            return { ...data, login: true };
         } else {
-            return { login: false };
+            return {login: false };
         }
     } catch (error) {
         console.log(error);
@@ -28,18 +31,27 @@ const MainPage = () => {
     console.log("MainPage render");
     const dispatch = useDispatch();
     const loaderData = useLoaderData();
+    const [loginStatus, setLoginStatus] = useState(loaderData)
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
-        if (loaderData.login) {
-            dispatch(setLoginState(true));
+        if (location.pathname === "/") navigate("/home");
+    }, []);
+
+    useEffect(() => {
+        if (loginStatus.login) {
+            dispatch(setLoginState({login: loginStatus.login, email: loginStatus.email, appname: loginStatus.appname}));
         }
-    }, [loaderData]);
+    }, [loginStatus]);
 
     return (
         <>
             <Header></Header>
             <div className="main-page-body">
-                <Outlet></Outlet>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <Outlet></Outlet>
+                </Suspense>
             </div>
             <footer></footer>
         </>

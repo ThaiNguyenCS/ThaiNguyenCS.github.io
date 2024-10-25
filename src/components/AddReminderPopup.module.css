@@ -1,0 +1,113 @@
+.scrim {
+    background-color: rgba(183, 183, 183, 0.425);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2000;
+    position: fixed;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: 50%;
+    border-radius: 20px;
+    padding: 20px 30px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.header-title {
+    font-weight: 600;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    align-self: center;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.day-picker-container
+{
+    display: flex;
+    align-items: center;
+}
+
+
+.sub-title
+{
+    font-size: 0.9rem;
+    font-weight: 400;
+    user-select: none;
+}
+
+
+.task-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+
+.check-box:focus
+{
+    outline: none;
+}
+
+.check-box:focus-visible
+{
+    outline: 2px solid blue;
+}
+
+
+.task-textarea {
+    width: 70%;
+    resize: vertical;
+    min-height: 3rem;
+    max-height: 300px;
+    padding: 8px 10px;
+    font-size: inherit;
+    border-radius: 10px;
+}
+
+.option-container
+{
+    display: flex;
+    margin-top: 50px;
+}
+
+.option-button
+{
+    font-size: 0.9rem;
+    font-weight: 600;
+    width: 80px;
+    cursor: pointer;
+    padding: 6px 0;
+    border: none;
+    border-radius: 4px;
+}
+
+.add-button
+{
+    margin-right: 10px;
+    background-color: rgb(0, 0, 147);
+    color: white;
+}
+
+.cancel-button
+{
+    color: rgb(60, 60, 60);
+}
+
+.flex-row-center
+{
+    align-items: center;
+    margin-bottom: 10px;
+}

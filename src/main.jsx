@@ -1,10 +1,11 @@
-import { StrictMode } from "react";
+import { lazy, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Dictation, loader as dictationLoader } from "./components/Dictation.jsx";
-import { DictationTopics, loader as topicLoader } from "./components/DictationTopics.jsx";
+import { loader as topicLoader } from "./components/DictationTopics.jsx";
+const DictationTopics = lazy(() => fakeLoading(import("./components/DictationTopics.jsx")));
 import store from "./store.js";
 import { Provider } from "react-redux";
 import { loader as mainPageLoader, MainPage } from "./components/MainPage.jsx";
@@ -21,7 +22,7 @@ import {
 } from "./components/TestPractice.jsx";
 import { TestResult, loader as testResultLoader } from "./components/TestResult.jsx";
 import { Flashcard, loader as flashcardLoader, action as flashcardAction } from "./components/Flashcard.jsx";
-import { FlashcardItem } from "./components/FlashcardItem.jsx";
+
 import {
     action as flashcardDetailAction,
     FlashcardDetail,
@@ -39,6 +40,8 @@ import {
     action as flashcardTestAction,
 } from "./components/FlashcardTest.jsx";
 import { CurrentNavigation } from "./components/CurrentNavigation.jsx";
+import HomePage, { action as homePageAction, loader as homePageLoader } from "./components/HomePage.jsx";
+import { loader as profileLoader, Profile, action as profileAction } from "./components/Profile.jsx";
 
 const router = createBrowserRouter([
     {
@@ -52,9 +55,21 @@ const router = createBrowserRouter([
                 element: (
                     <>
                         <CurrentNavigation />
-                        <div>Home page</div>
+                        <HomePage />
                     </>
                 ),
+                loader: homePageLoader,
+                action: homePageAction
+            },
+            {
+                path: "profile",
+                element: (
+                    <>
+                        <Profile />
+                    </>
+                ),
+                loader: profileLoader,
+                action: profileAction,
             },
             {
                 path: "dictation",
@@ -203,3 +218,11 @@ createRoot(document.getElementById("root")).render(
         </Provider>
     </StrictMode>
 );
+
+function fakeLoading(promise) {
+    return new Promise((res) => {
+        setTimeout(() => {
+            res(promise);
+        }, 2000);
+    });
+}

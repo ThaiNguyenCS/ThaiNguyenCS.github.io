@@ -42,7 +42,7 @@ const DictationExContext = createContext(null);
 const loader = async ({ params, request }) => {
     console.log(`request to /data/${params.topic}/${params.exerciseID}`);
 
-    const token = localStorage.getItem("jwt_token");
+    
     const res = await axios.get(
         `${apiURL}/data/${params.topic}/${params.exerciseID}`, axiosRequestWithCookieOption
     );

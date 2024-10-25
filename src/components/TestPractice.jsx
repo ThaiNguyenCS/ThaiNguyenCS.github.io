@@ -1,9 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Form, redirect, useLoaderData, useSubmit } from "react-router-dom";
+import { Form, Link, redirect, useLoaderData, useSubmit } from "react-router-dom";
 import { TestQuestion } from "./TestQuestion";
 import styles from "./TestPractice.module.css";
 import { v4 as uuidv4 } from "uuid";
+const domain = import.meta.env.VITE_DOMAIN;
 
 import {
     convertPixelSizeToNumber,
@@ -12,12 +13,17 @@ import {
     generateSQLTimestamp,
 } from "../utils/handleInput";
 import SubmitPopup from "./SubmitPopup";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
+import { generateRedirectURL } from "../utils/redirectURL";
 const apiURL = import.meta.env.VITE_API_URL;
 
 const loader = async ({ request, params }) => {
     const url = new URL(request.url);
     console.log("start load");
-    const response = await axios.get(`${apiURL}/tests/foo/${params.id}${url.search}`);
+    const response = await axios.get(
+        `${apiURL}/tests/foo/${params.id}/practice${url.search}`,
+        axiosRequestWithCookieOption
+    );
     console.log("end load");
     const data = response.data;
     if (data.result) {
@@ -25,7 +31,7 @@ const loader = async ({ request, params }) => {
         return data.data;
     }
     console.log("No test practice");
-    return null;
+    return { testID: params.id, searchQuery: url.search };
 };
 
 const action = async ({ request, params }) => {
@@ -49,7 +55,7 @@ const action = async ({ request, params }) => {
 
 const TestPractice = () => {
     // console.log("TestPractice");
-    const { test, parts, sections, questions } = useLoaderData();
+    const { test, parts, sections, questions, testID, searchQuery } = useLoaderData();
     const [currentPart, setCurrentPart] = useState(null);
     const [timing, setTiming] = useState("00:00");
 
@@ -81,7 +87,7 @@ const TestPractice = () => {
     }, questions);
 
     useEffect(() => {
-        if (resizeBar) {
+        if (resizeBar.current) {
             let marginLeft = getComputedStyle(resizeBar.current).marginLeft;
             let marginRight = getComputedStyle(resizeBar.current).marginRight;
             const totalResizeBarWidth =
@@ -150,7 +156,7 @@ const TestPractice = () => {
 
     const generateTableSections = (sections) => {
         const holder = [];
-        for (let s = 0; s < sections.length; s++) {
+        for (let s = 0; s < sections?.length; s++) {
             if (sections[s].sectionType === "table") {
                 const tableCellArr = JSON.parse(sections[s].tableCells);
                 console.log(tableCellArr);
@@ -168,12 +174,12 @@ const TestPractice = () => {
                     id: sections[s].id,
                     htmlCode: (
                         <>
-                            <table>
-                                <tbody>
+                            <table className={styles['module-table']}> 
+                                <tbody className={styles['module-tbody']}>
                                     {tableRows.map((row) => (
-                                        <tr>
+                                        <tr className={styles['module-tr']}>
                                             {row.map((cell) => (
-                                                <td>{cell}</td>
+                                                <td className={styles['module-td']}>{cell}</td>
                                             ))}
                                         </tr>
                                     ))}
@@ -196,165 +202,192 @@ const TestPractice = () => {
         setQuestionMark(newState);
     };
 
+    const generateRedirectURLFromLogin = () => {
+        return generateRedirectURL(`${domain}/login`, `/tests/practice/${testID}${searchQuery}`);
+    };
+
     return (
         <>
-            <div className={styles["test-title"]}>{test.title || ""}</div>
             <div className={styles["container"]}>
-                <div className={styles["test-side"]} ref={containerRef}>
-                    <div
-                        className={styles["left-section"]}
-                        // style={{ flexBasis: '0%' }}
-                        ref={questionSection}
-                    >
-                        {parts &&
-                            parts.length > 0 &&
-                            parts.map((part) => (
-                                <>
-                                    <div
-                                        className={`${styles["part-container"]} ${
-                                            part === currentPart ? styles["active"] : ""
-                                        }`}
-                                    >
-                                        <div>{part.title || "NULL PART TITLE"}</div>
-                                        <div>{part.partGuide || "NULL PART GUIDE"}</div>
-                                        <div>{part.partContent || "NULL PART CONTENT"}</div>
-                                    </div>
-                                </>
-                            ))}
-                    </div>
-                    <div className={styles["resize-bar"]} ref={resizeBar}></div>
-                    <div
-                        className={styles["right-section"]}
-                        // style={{ flexBasis: '0%' }}
-                        ref={answerSection}
-                    >
-                        <Form ref={formRef}>
-                            <input type="hidden" name="testID" value={(test && test.id) || ""} />
-                            <input type="hidden" name="partArr" value={getPartOrderJSONArr(parts)} />
-                            <input
-                                type="hidden"
-                                name="startingTime"
-                                value={generateSQLTimestamp(startingTimeRef.current)}
-                            />
-                            <input type="hidden" name="duration" value={second.current || 0} />
-                            {currentPart &&
-                                sections &&
-                                sections.length > 0 &&
-                                sections.map((section) => (
-                                    <>
-                                        <div
-                                            className={`${styles["section-container"]} ${
-                                                section.partOrder === currentPart.partOrder ? styles["active"] : ""
-                                            }`}
-                                        >
-                                            <div>Section: {section.sectionOrder || "NULL SECTION ORDER"}</div>
-                                            <div>{section.title || "NULL SECTION TITLE"}</div>
-                                            <div>{section.sectionGuide || "NULL SECTION GUIDE"}</div>
-                                            {section.sectionType === "table" &&
-                                                tables.find((table) => table.id === section.id).htmlCode}
-
-                                            {questions &&
-                                                questions.length > 0 &&
-                                                questions
-                                                    .filter(
-                                                        (question) =>
-                                                            question.sectionOrder === section.sectionOrder &&
-                                                            question.partOrder === section.partOrder
-                                                    )
-                                                    .map((question) => (
-                                                        <>
-                                                            <TestQuestion
-                                                                onClick={() => {
-                                                                    setQuestionMark((state) => {
-                                                                        const newState = {
-                                                                            ...state,
-                                                                        };
-                                                                        newState[question.id] = {
-                                                                            ...newState[question.id],
-                                                                            isMarked: !newState[question.id].isMarked,
-                                                                        };
-                                                                        return newState;
-                                                                    });
-                                                                }}
-                                                                className={
-                                                                    questionMark[question.id].isMarked
-                                                                        ? "book-mark"
-                                                                        : ""
-                                                                }
-                                                                question={question}
-                                                                value={questionMark[question.id].input}
-                                                                id={`question-${question.id}`}
-                                                                onInputChange={handleInputChange}
-                                                            ></TestQuestion>
-                                                        </>
-                                                    ))}
-                                        </div>
-                                    </>
-                                ))}
-                        </Form>
-                    </div>
-                </div>
-                <div className={styles["control-side"]}>
-                    <div>Time</div>
-                    <div>{timing}</div>
-                    <div>
-                        {parts &&
-                            parts.length > 0 &&
-                            parts.map((part) => (
-                                <>
-                                    <div>Part {part.partOrder || "NULL PART ORDER"}</div>
-                                    <div className={styles["question-nav-container"]}>
-                                        {questions
-                                            .filter((question) => question.partOrder === part.partOrder)
-                                            .map((question) => (
+                {test ? (
+                    <>
+                        <div className={styles["test-title"]}>{test?.title || ""}</div>
+                        <div className={styles["test-container"]}>
+                            <div className={styles["test-side"]} ref={containerRef}>
+                                <div
+                                    className={styles["left-section"]}
+                                    // style={{ flexBasis: '0%' }}
+                                    ref={questionSection}
+                                >
+                                    {parts &&
+                                        parts.length > 0 &&
+                                        parts.map((part) => (
+                                            <>
                                                 <div
-                                                    className={`${styles["question-nav-button"]} ${
-                                                        questionMark[question.id]?.isMarked ? styles["book-mark"] : ""
-                                                    } ${questionMark[question.id]?.input ? styles["done"] : ""}`}
-                                                    data-question-id={`question-${question.id}`}
-                                                    data-part-order={part.partOrder}
-                                                    onClick={(e) => {
-                                                        if (
-                                                            Number(e.target.dataset.partOrder) === currentPart.partOrder
-                                                        ) {
-                                                        } else {
-                                                            setCurrentPart(
-                                                                parts.find(
-                                                                    (part) =>
-                                                                        part.partOrder ===
-                                                                        Number(e.target.dataset.partOrder)
-                                                                )
-                                                            );
-                                                        }
-                                                        const question = document.querySelector(
-                                                            `#${e.target.dataset.questionId}`
-                                                        );
-                                                        setTimeout(() => {
-                                                            question.scrollIntoView({
-                                                                block: "center",
-                                                                inline: "nearest",
-                                                                behavior: "smooth",
-                                                            });
-                                                            question.style.outline = "2px solid yellow";
-                                                            setTimeout(() => {
-                                                                question.style.outline = "none";
-                                                            }, 1000);
-                                                        }, 25);
-                                                    }}
+                                                    className={`${styles["part-container"]} ${
+                                                        part === currentPart ? styles["active"] : ""
+                                                    }`}
                                                 >
-                                                    {question.questionOrder}
+                                                    <div>{part.title || "NULL PART TITLE"}</div>
+                                                    <div>{part.partGuide || "NULL PART GUIDE"}</div>
+                                                    <div>{part.partContent || "NULL PART CONTENT"}</div>
                                                 </div>
+                                            </>
+                                        ))}
+                                </div>
+                                <div className={styles["resize-bar"]} ref={resizeBar}></div>
+                                <div
+                                    className={styles["right-section"]}
+                                    // style={{ flexBasis: '0%' }}
+                                    ref={answerSection}
+                                >
+                                    <Form ref={formRef}>
+                                        <input type="hidden" name="testID" value={(test && test.id) || ""} />
+                                        <input type="hidden" name="partArr" value={getPartOrderJSONArr(parts)} />
+                                        <input
+                                            type="hidden"
+                                            name="startingTime"
+                                            value={generateSQLTimestamp(startingTimeRef.current)}
+                                        />
+                                        <input type="hidden" name="duration" value={second.current || 0} />
+                                        {currentPart &&
+                                            sections &&
+                                            sections.length > 0 &&
+                                            sections.map((section) => (
+                                                <>
+                                                    <div
+                                                        className={`${styles["section-container"]} ${
+                                                            section.partOrder === currentPart.partOrder
+                                                                ? styles["active"]
+                                                                : ""
+                                                        }`}
+                                                    >
+                                                        {/* <div className={styles["section-order"]}>
+                                                            Section: {section.sectionOrder || "NULL SECTION ORDER"}
+                                                        </div> */}
+                                                        <div className={styles["section-title"]}>{section.title || "NULL SECTION TITLE"}</div>
+                                                        <div className={styles["section-guide"]}>{section.sectionGuide || "NULL SECTION GUIDE"}</div>
+                                                        {section.sectionType === "table" &&
+                                                            tables.find((table) => table.id === section.id).htmlCode}
+
+                                                        {questions &&
+                                                            questions.length > 0 &&
+                                                            questions
+                                                                .filter(
+                                                                    (question) =>
+                                                                        question.sectionOrder ===
+                                                                            section.sectionOrder &&
+                                                                        question.partOrder === section.partOrder
+                                                                )
+                                                                .map((question) => (
+                                                                    <>
+                                                                        <TestQuestion
+                                                                            onClick={() => {
+                                                                                setQuestionMark((state) => {
+                                                                                    const newState = {
+                                                                                        ...state,
+                                                                                    };
+                                                                                    newState[question.id] = {
+                                                                                        ...newState[question.id],
+                                                                                        isMarked:
+                                                                                            !newState[question.id]
+                                                                                                .isMarked,
+                                                                                    };
+                                                                                    return newState;
+                                                                                });
+                                                                            }}
+                                                                            className={
+                                                                                questionMark[question.id].isMarked
+                                                                                    ? "book-mark"
+                                                                                    : ""
+                                                                            }
+                                                                            question={question}
+                                                                            value={questionMark[question.id].input}
+                                                                            id={`question-${question.id}`}
+                                                                            onInputChange={handleInputChange}
+                                                                        ></TestQuestion>
+                                                                    </>
+                                                                ))}
+                                                    </div>
+                                                </>
                                             ))}
-                                    </div>
-                                </>
-                            ))}
+                                    </Form>
+                                </div>
+                            </div>
+                            <div className={styles["control-side"]}>
+                                <div className={styles['timer-title']}>Time</div>
+                                <div className={styles['timer-display']}>{timing}</div>
+                                <div>
+                                    {parts &&
+                                        parts.length > 0 &&
+                                        parts.map((part) => (
+                                            <>
+                                                <div className={styles['control-part']}>Part {part.partOrder || "NULL PART ORDER"}</div>
+                                                <div className={styles["question-nav-container"]}>
+                                                    {questions
+                                                        .filter((question) => question.partOrder === part.partOrder)
+                                                        .map((question) => (
+                                                            <div
+                                                                className={`${styles["question-nav-button"]} ${
+                                                                    questionMark[question.id]?.isMarked
+                                                                        ? styles["book-mark"]
+                                                                        : ""
+                                                                } ${
+                                                                    questionMark[question.id]?.input
+                                                                        ? styles["done"]
+                                                                        : ""
+                                                                }`}
+                                                                data-question-id={`question-${question.id}`}
+                                                                data-part-order={part.partOrder}
+                                                                onClick={(e) => {
+                                                                    if (
+                                                                        Number(e.target.dataset.partOrder) ===
+                                                                        currentPart.partOrder
+                                                                    ) {
+                                                                    } else {
+                                                                        setCurrentPart(
+                                                                            parts.find(
+                                                                                (part) =>
+                                                                                    part.partOrder ===
+                                                                                    Number(e.target.dataset.partOrder)
+                                                                            )
+                                                                        );
+                                                                    }
+                                                                    const question = document.querySelector(
+                                                                        `#${e.target.dataset.questionId}`
+                                                                    );
+                                                                    setTimeout(() => {
+                                                                        question.scrollIntoView({
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                            behavior: "smooth",
+                                                                        });
+                                                                        question.style.outline = "2px solid yellow";
+                                                                        setTimeout(() => {
+                                                                            question.style.outline = "none";
+                                                                        }, 1000);
+                                                                    }, 25);
+                                                                }}
+                                                            >
+                                                                {question.questionOrder}
+                                                            </div>
+                                                        ))}
+                                                </div>
+                                            </>
+                                        ))}
+                                </div>
+                                <button className={styles["submit-button"]} onClick={() => sendResult()}>
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div>
+                        Please <Link to={generateRedirectURLFromLogin()}>login</Link>
                     </div>
-                    <button className={styles["submit-button"]} onClick={() => sendResult()}>
-                        Submit
-                    </button>
-                </div>
+                )}
             </div>
-            {/* <SubmitPopup></SubmitPopup> */}
         </>
     );
 };

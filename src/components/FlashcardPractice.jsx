@@ -3,8 +3,9 @@ import styles from "./FlashcardPractice.module.css";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import axios from "axios";
-import { getJWTToken } from "../utils/authentication"
+import { getJWTToken } from "../utils/authentication";
 import { useLoaderData, useSubmit } from "react-router-dom";
+import { axiosRequestWithCookieOption } from "../utils/requestOption";
 const dataURL = import.meta.env.VITE_DATA_URL;
 
 const loader = async ({ request, params }) => {
@@ -12,11 +13,7 @@ const loader = async ({ request, params }) => {
     const queryParams = new URLSearchParams(url.searchParams);
     const wordResponse = await axios.get(
         `${dataURL}/flashcard/${params.id}/practice-words/?limit=${queryParams.get("limit")}`,
-        {
-            headers: {
-                Authorization: `Bearer ${getJWTToken() || "no_token"}`,
-            },
-        }
+        axiosRequestWithCookieOption
     );
     const loaderData = {};
     const data = wordResponse.data;
@@ -37,13 +34,12 @@ const action = async ({ request, params }) => {
         try {
             const result = await axios.put(`${dataURL}/flashcard/${params.id}/practice-words`, formData, {
                 headers: {
-                    Authorization: `Bearer ${getJWTToken() || "no_token"}`
-                }
+                    Authorization: `Bearer ${getJWTToken() || "no_token"}`,
+                },
             });
-            return {isSaved: true, result}
-            
+            return { isSaved: true, result };
         } catch (error) {
-            return {isSaved: false}
+            return { isSaved: false };
         }
     }
     return null;
@@ -178,7 +174,9 @@ const FlashcardPractice = () => {
                         {resultStrMapping()}
                     </div>
                 </div>
-                <div className={styles["progress-num"]}>{currentWordIdx+1}/{currentRound.length}</div>
+                <div className={styles["progress-num"]}>
+                    {currentWordIdx + 1}/{currentRound.length}
+                </div>
                 <div className={styles["option-container"]}>
                     <button className={styles["forget-option-button"]} onClick={() => goToTheNextCard(-1)}>
                         Forgot

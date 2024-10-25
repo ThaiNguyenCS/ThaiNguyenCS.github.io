@@ -10,7 +10,7 @@ import { axiosRequestWithCookieOption } from "../utils/requestOption";
 const dataURL = import.meta.env.VITE_DATA_URL;
 
 const loader = async () => {
-    const token = getJWTToken();
+    
     const response = await axios.get(`${dataURL}/flashcard`, axiosRequestWithCookieOption);
     const data = response.data;
     if (data.result) {
