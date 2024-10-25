@@ -9,6 +9,8 @@ import IcGoogle from "../assets/ic_google.png";
 import { axiosRequestWithCookieOption } from "../utils/requestOption";
 
 const serverURL = import.meta.env.VITE_SERVER_DOMAIN;
+console.log("ServerURL", serverURL);
+
 
 const action = async ({ request, params }) => {
     console.log(request);
@@ -44,9 +46,12 @@ const Login = () => {
                     console.log("login successfully");
                     dispatch(setLoginState({login: true, email: loginStatus.data.email, appname: loginStatus.data.appname}));
                     if (location.search !== "") {
+                        console.log("location.search");
+                        
                         const redirect = new URLSearchParams(location.search);
                         navigate(redirect.get("redirect"), { replace: true });
                     } else {
+                        console.log("home");
                         navigate("/home", { replace: true }); // back to the home page and clear login page
                     }
                 }
